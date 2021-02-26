@@ -1,0 +1,4 @@
+app:
+  run_mode: debug
+  app_path:
+  template_path: web/template

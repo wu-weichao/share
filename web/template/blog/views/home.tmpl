@@ -1,0 +1,15 @@
+{{ define "content" }}
+
+<div class="content">
+    {{ range .posts}}
+        <div>{{ .title }}</div>
+        <div>
+            <div>{{ .create_at }}</div>
+            <div>{{ .tags }}</div>
+            <div>{{ .views }}</div>
+        </div>
+        <div>{{ .intro }}</div>
+    {{ end }}
+</div>
+
+{{ end }}
