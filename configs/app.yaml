@@ -2,3 +2,6 @@ app:
   run_mode: debug
   app_path:
   template_path: web/template
+jwt:
+  secret: wuweichao.com
+  ttl: 86400

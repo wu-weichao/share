@@ -6,11 +6,17 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"path/filepath"
+	//"share/internal/app/middleware"
+	"share/internal/app/service/api/v1"
 	"share/internal/app/service/web"
 )
 
 func InitRouter() *gin.Engine {
-	r := gin.Default()
+	//r := gin.Default()
+	r := gin.New()
+
+	// middleware
+	r.Use()
 
 	// templates
 	r.HTMLRender = loadTemplates("../../web/template/blog")
@@ -23,9 +29,17 @@ func InitRouter() *gin.Engine {
 
 	// route group
 	// api group
-	v1 := r.Group("/api/v1")
+	apiv1 := r.Group("/api/v1")
 	{
-		v1.GET("/login")
+		apiv1.POST("/login", v1.Login)
+		//apiv1.POST("/logout")
+
+		// with auth token
+		//apiv1WithAuth := apiv1.Group("")
+		//apiv1WithAuth.Use(middleware.JwtCheck())
+		{
+			//apiv1WithAuth.GET("/user_info")
+		}
 	}
 	// frontend group
 	front := r.Group("/blog")
