@@ -1,32 +1,77 @@
 package v1
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
-	"net/http"
 	"share/internal/app/middleware"
 	"share/internal/app/service/api"
 	"share/internal/models"
 )
 
+type LoginRequest struct {
+	Email    string `form:"email" binding:"required" message:"email is required"`
+	Password string `form:"password" binding:"required" message:"password is required"`
+}
+
+type UserResponse struct {
+	ID        uint   `json:"id"`
+	CreatedAt int64  `json:"created_at"`
+	Name      string `json:"name"`
+	Avatar    string `json:"avatar"`
+	Email     string `json:"email"`
+	Phone     string `json:"phone"`
+	Type      int    `json:"type"`
+	Status    int    `json:"status"`
+}
+
 func Login(c *gin.Context) {
-	var user models.User
-	err := models.DB.Where("id = ?", 1).First(&user).Error
-	if err != nil {
-		fmt.Printf("user models error %+v\n", err)
+	// validate params
+	var form LoginRequest
+	var err error
+	if err = c.ShouldBind(&form); err != nil {
+		api.ErrorRequest(c, err.Error())
+		return
 	}
+	// get user
+	user, err := models.UserGetByEmail(form.Email)
+	if err != nil {
+		api.ErrorRequest(c, "Incorrect username or password")
+		return
+	}
+	if models.UserEncodePassword(form.Password) != user.Password {
+		api.ErrorRequest(c, "Incorrect username or password")
+		return
+	}
+
 	// login success
-	jwt := middleware.Jwt{}
-	token, expire, err := jwt.Create(&user)
+	jwt := middleware.NewJwt("")
+	jwt, err = jwt.Create(user)
 	if err != nil {
-		fmt.Pintf("login error %+v\n", err)
+		api.ErrorRequest(c, "Token generation failed")
+		return
 	}
-	c.JSON(http.StatusOK, api.Response{
-		Code:    http.StatusOK,
-		Message: "success",
-		Data: map[string]interface{}{
-			"token":  token,
-			"expire": expire,
-		},
+	api.Success(c, map[string]interface{}{
+		"token":  jwt.Token,
+		"expire": jwt.Expire,
+	})
+}
+
+func LoginUserInfo(c *gin.Context) {
+	// get login user
+	jwtUser, _ := c.Get("user")
+	user, err := models.UserGetById(jwtUser.(*middleware.CustomClaims).ID)
+	if err != nil {
+		api.ErrorRequest(c, "User not exists")
+		return
+	}
+
+	api.Success(c, UserResponse{
+		ID:        user.ID,
+		CreatedAt: user.CreatedAt.Unix(),
+		Name:      user.Name,
+		Avatar:    user.Avatar,
+		Email:     user.Email,
+		Phone:     user.Phone,
+		Type:      user.Type,
+		Status:    user.Status,
 	})
 }

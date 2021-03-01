@@ -6,6 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"path/filepath"
+	"share/internal/app/middleware"
+
 	//"share/internal/app/middleware"
 	"share/internal/app/service/api/v1"
 	"share/internal/app/service/web"
@@ -35,10 +37,22 @@ func InitRouter() *gin.Engine {
 		//apiv1.POST("/logout")
 
 		// with auth token
-		//apiv1WithAuth := apiv1.Group("")
-		//apiv1WithAuth.Use(middleware.JwtCheck())
+		apiv1WithAuth := apiv1.Group("")
+		apiv1WithAuth.Use(middleware.JWTAuth())
 		{
-			//apiv1WithAuth.GET("/user_info")
+			apiv1WithAuth.GET("/user_info", v1.LoginUserInfo)
+
+			apiv1WithAuth.GET("/tags", v1.GetTags)
+			apiv1WithAuth.GET("/tags/:id", v1.GetTag)
+			apiv1WithAuth.POST("/tags", v1.StoreTag)
+			apiv1WithAuth.PUT("/tags/:id", v1.UpdateTag)
+			apiv1WithAuth.DELETE("/tags/:id")
+
+			apiv1WithAuth.GET("/articles")
+			apiv1WithAuth.GET("/articles/:id")
+			apiv1WithAuth.POST("/articles")
+			apiv1WithAuth.PUT("/articles/:id")
+			apiv1WithAuth.DELETE("/articles/:id")
 		}
 	}
 	// frontend group
