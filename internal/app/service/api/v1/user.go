@@ -14,7 +14,7 @@ type LoginRequest struct {
 
 type UserResponse struct {
 	ID        uint   `json:"id"`
-	CreatedAt int64  `json:"created_at"`
+	CreatedAt int    `json:"created_at"`
 	Name      string `json:"name"`
 	Avatar    string `json:"avatar"`
 	Email     string `json:"email"`
@@ -66,7 +66,7 @@ func LoginUserInfo(c *gin.Context) {
 
 	api.Success(c, UserResponse{
 		ID:        user.ID,
-		CreatedAt: user.CreatedAt.Unix(),
+		CreatedAt: user.CreatedAt,
 		Name:      user.Name,
 		Avatar:    user.Avatar,
 		Email:     user.Email,

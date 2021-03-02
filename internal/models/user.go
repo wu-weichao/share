@@ -3,14 +3,13 @@ package models
 import (
 	"crypto/sha256"
 	"encoding/hex"
-	"gorm.io/gorm"
 )
 
 type User struct {
-	gorm.Model
+	Model
 
 	Name     string `gorm:"size:100" json:"name"`
-	Password string `gorm:"size:255" json:"password"`
+	Password string `gorm:"size:255" json:"-"`
 	Avatar   string `gorm:"size:512" json:"avatar"`
 	Email    string `gorm:"index;size:255" json:"email"`
 	Phone    string `gorm:"index;size:50" json:"phone"`

@@ -1,15 +1,13 @@
 package models
 
-import "gorm.io/gorm"
-
 type Tag struct {
-	gorm.Model
+	Model
 
-	Name        string `gorm:"size:100" json:"name"`
-	Flag        string `gorm:"index;size:50" json:"flag"`
-	Icon        string `gorm:"size:512" json:"icon"`
-	Description string `gorm:"size:512" json:"description"`
-	Status      int    `gorm:"default:1;comment:1 enable 0 disable" json:"status"`
+	Name        string `gorm:"size:100" json:"name,omitempty"`
+	Flag        string `gorm:"index;size:50" json:"flag,omitempty"`
+	Icon        string `gorm:"size:512" json:"icon,omitempty"`
+	Description string `gorm:"size:512" json:"description,omitempty"`
+	Status      int    `gorm:"default:1;comment:1 enable 0 disable" json:"status,omitempty"`
 }
 
 func TagGetAll(pageNum, pageSize int, maps interface{}) ([]*Tag, error) {
@@ -38,6 +36,15 @@ func TagGetById(id int) (*Tag, error) {
 		return nil, err
 	}
 	return &tag, nil
+}
+
+func TagGetByIds(ids []int) ([]*Tag, error) {
+	var tags []*Tag
+	err := db.Select("id", "name", "flag").Where("id IN ?", ids).Find(&tags).Error
+	if err != nil {
+		return nil, err
+	}
+	return tags, nil
 }
 
 func TagGetByFlag(flag string) (*Tag, error) {

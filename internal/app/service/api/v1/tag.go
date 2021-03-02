@@ -16,8 +16,8 @@ type TagStoreRequest struct {
 
 type TagResponse struct {
 	ID          uint   `json:"id"`
-	CreatedAt   int64  `json:"created_at"`
-	UpdatedAt   int64  `json:"updated_at"`
+	CreatedAt   int    `json:"created_at"`
+	UpdatedAt   int    `json:"updated_at"`
 	Name        string `json:"name"`
 	Flag        string `json:"flag"`
 	Icon        string `json:"icon"`
@@ -28,22 +28,27 @@ type TagResponse struct {
 func GetTags(c *gin.Context) {
 	p := api.NewPagination(c)
 	var maps map[string]interface{}
-	tags, err := models.TagGetAll(p.Page, p.PageSize, maps)
-	if err != nil {
-		api.ErrorRequest(c, "Get tags failed")
-		return
-	}
 	total, err := models.TagGetTotal(maps)
 	if err != nil {
 		api.ErrorRequest(c, "Get tags failed")
 		return
 	}
 	p.Total = total
-	var ts []*TagResponse
+	if total == 0 {
+		api.SuccessPagination(c, []interface{}{}, p)
+		return
+	}
+	tags, err := models.TagGetAll(p.Page, p.PageSize, maps)
+	if err != nil {
+		api.ErrorRequest(c, "Get tags failed")
+		return
+	}
+
+	var r []*TagResponse
 	for _, tag := range tags {
-		ts = append(ts, &TagResponse{
+		r = append(r, &TagResponse{
 			ID:          tag.ID,
-			CreatedAt:   tag.CreatedAt.Unix(),
+			CreatedAt:   tag.CreatedAt,
 			Name:        tag.Name,
 			Flag:        tag.Flag,
 			Icon:        tag.Icon,
@@ -52,7 +57,7 @@ func GetTags(c *gin.Context) {
 		})
 	}
 
-	api.SuccessPagination(c, ts, p)
+	api.SuccessPagination(c, r, p)
 }
 
 func GetTag(c *gin.Context) {
@@ -66,7 +71,7 @@ func GetTag(c *gin.Context) {
 
 	api.Success(c, TagResponse{
 		ID:          tag.ID,
-		CreatedAt:   tag.CreatedAt.Unix(),
+		CreatedAt:   tag.CreatedAt,
 		Name:        tag.Name,
 		Flag:        tag.Flag,
 		Icon:        tag.Icon,
@@ -101,7 +106,7 @@ func StoreTag(c *gin.Context) {
 
 	api.Success(c, TagResponse{
 		ID:          tag.ID,
-		CreatedAt:   tag.CreatedAt.Unix(),
+		CreatedAt:   tag.CreatedAt,
 		Name:        tag.Name,
 		Flag:        tag.Flag,
 		Icon:        tag.Icon,

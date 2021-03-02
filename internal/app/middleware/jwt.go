@@ -38,7 +38,7 @@ func NewJwt(token string) *Jwt {
 
 func (j *Jwt) Create(user *models.User) (*Jwt, error) {
 	now := time.Now()
-	expire := now.Add(time.Duration(configs.Jwt.Ttl) * time.Second).Unix()
+	expire := now.Add(time.Duration(configs.Jwt.Ttl) * time.Minute).Unix()
 	claims := CustomClaims{
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expire,

@@ -7,6 +7,13 @@ import (
 	"share/internal/database"
 )
 
+type Model struct {
+	ID        uint           `gorm:"primarykey" json:"id"`
+	CreatedAt int            `gorm:"" json:"created_at,omitempty"`
+	UpdatedAt int            `gorm:"" json:"updated_at,omitempty"`
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"deleted_at,omitempty"`
+}
+
 var db *gorm.DB
 
 func init() {
@@ -17,5 +24,5 @@ func init() {
 	}
 	// model init
 	// table migrate
-	db.AutoMigrate(&User{}, &Tag{}, &Article{})
+	db.AutoMigrate(&User{}, &Tag{}, &Article{}, &ArticleTag{})
 }

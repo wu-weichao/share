@@ -4,4 +4,4 @@ app:
   template_path: web/template
 jwt:
   secret: wuweichao.com
-  ttl: 86400
+  ttl: 43200
