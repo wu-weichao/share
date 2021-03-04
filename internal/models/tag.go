@@ -10,19 +10,40 @@ type Tag struct {
 	Status      int    `gorm:"default:1;comment:1 enable 0 disable" json:"status,omitempty"`
 }
 
-func TagGetAll(pageNum, pageSize int, maps interface{}) ([]*Tag, error) {
+func TagGetAll(pageNum, pageSize int, maps map[string]interface{}) ([]*Tag, error) {
 	var tags []*Tag
 	offset := (pageNum - 1) * pageSize
-	err := db.Where(maps).Offset(offset).Limit(pageSize).Find(&tags).Error
+	tagDb := db.Model(&Tag{})
+	for query, args := range maps {
+		tagDb.Where(query, args)
+	}
+	err := tagDb.Offset(offset).Limit(pageSize).Find(&tags).Error
 	if err != nil {
 		return nil, err
 	}
 	return tags, nil
 }
 
-func TagGetTotal(maps interface{}) (int, error) {
+func TagGetSimpleAll(maps map[string]interface{}) ([]*Tag, error) {
+	var tags []*Tag
+	tagDb := db.Model(&Tag{})
+	for query, args := range maps {
+		tagDb.Where(query, args)
+	}
+	err := tagDb.Select("id, name, flag").Find(&tags).Error
+	if err != nil {
+		return nil, err
+	}
+	return tags, nil
+}
+
+func TagGetTotal(maps map[string]interface{}) (int, error) {
 	var total int64
-	err := db.Model(&Tag{}).Where(maps).Count(&total).Error
+	tagDb := db.Model(&Tag{})
+	for query, args := range maps {
+		tagDb.Where(query, args)
+	}
+	err := tagDb.Count(&total).Error
 	if err != nil {
 		return 0, err
 	}

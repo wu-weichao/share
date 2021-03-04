@@ -18,7 +18,7 @@ func InitRouter() *gin.Engine {
 	r := gin.New()
 
 	// middleware
-	r.Use()
+	r.Use(middleware.Cors())
 
 	// templates
 	r.HTMLRender = loadTemplates("../../web/template/blog")
@@ -43,6 +43,7 @@ func InitRouter() *gin.Engine {
 			apiv1WithAuth.GET("/user_info", v1.LoginUserInfo)
 
 			apiv1WithAuth.GET("/tags", v1.GetTags)
+			apiv1WithAuth.GET("/simple_tags", v1.GetSimpleTags)
 			apiv1WithAuth.GET("/tags/:id", v1.GetTag)
 			apiv1WithAuth.POST("/tags", v1.StoreTag)
 			apiv1WithAuth.PUT("/tags/:id", v1.UpdateTag)

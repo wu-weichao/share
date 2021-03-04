@@ -20,14 +20,16 @@ type ArticleRequest struct {
 
 type ArticleResponse struct {
 	ID          uint   `json:"id"`
-	CreatedAt   int    `json:"created_at"`
-	UpdatedAt   int    `json:"updated_at"`
 	Title       string `json:"title"`
 	Cover       string `json:"cover"`
 	Keywords    string `json:"keywords"`
 	Description string `json:"description"`
 	Content     string `json:"content"`
 	Type        int    `json:"type"`
+	Published   int    `json:"published"`
+	CreatedAt   int    `json:"created_at"`
+	UpdatedAt   int    `json:"updated_at"`
+	PublishedAt int    `json:"published_at"`
 
 	Tags []*ArticleTagResponse `json:"tags"`
 }
@@ -51,7 +53,8 @@ func GetArticles(c *gin.Context) {
 		api.SuccessPagination(c, []interface{}{}, p)
 		return
 	}
-	articles, err := models.ArticleGetAll(p.Page, p.PageSize, maps)
+	sort := c.Query("sort")
+	articles, err := models.ArticleGetAll(p.Page, p.PageSize, maps, sort)
 	if err != nil {
 		api.ErrorRequest(c, "Get Articles failed")
 		return
@@ -80,14 +83,17 @@ func GetArticles(c *gin.Context) {
 		}
 		r = append(r, &ArticleResponse{
 			ID:          article.ID,
-			CreatedAt:   article.CreatedAt,
-			UpdatedAt:   article.UpdatedAt,
 			Title:       article.Title,
 			Cover:       article.Cover,
 			Keywords:    article.Keywords,
 			Description: article.Description,
 			//Content:     article.Content,
-			Type: article.Type,
+			Type:        article.Type,
+			Published:   article.Published,
+			CreatedAt:   article.CreatedAt,
+			UpdatedAt:   article.UpdatedAt,
+			PublishedAt: article.PublishedAt,
+
 			Tags: resTags,
 		})
 
@@ -105,23 +111,39 @@ func GetArticle(c *gin.Context) {
 		return
 	}
 	//tagID
+	tags, err := models.ArticleTagGetByArticleId(artId)
+	if err != nil {
+		api.ErrorRequest(c, "Get article failed")
+		return
+	}
 	//article.Tags
+	var articleTags []*ArticleTagResponse
+	for _, tag := range tags {
+		articleTags = append(articleTags, &ArticleTagResponse{
+			ID:   tag.ID,
+			Name: tag.Name,
+			Flag: tag.Flag,
+		})
+	}
 
 	api.Success(c, ArticleResponse{
 		ID:          article.ID,
-		CreatedAt:   article.CreatedAt,
-		UpdatedAt:   article.UpdatedAt,
 		Title:       article.Title,
 		Cover:       article.Cover,
 		Keywords:    article.Keywords,
 		Description: article.Description,
 		Content:     article.Content,
 		Type:        article.Type,
-		Tags:        nil,
+		Published:   article.Published,
+		CreatedAt:   article.CreatedAt,
+		UpdatedAt:   article.UpdatedAt,
+		PublishedAt: article.PublishedAt,
+		Tags:        articleTags,
 	})
 
 }
 
+// TODO: 增加发布状态管理
 func StoreArticle(c *gin.Context) {
 	var form ArticleRequest
 	var err error
@@ -185,11 +207,80 @@ func StoreArticle(c *gin.Context) {
 		Type:        article.Type,
 		Tags:        articleTags,
 	})
-
 }
 
 func UpdateArticle(c *gin.Context) {
+	var form ArticleRequest
+	var err error
+	if err = c.ShouldBind(&form); err != nil {
+		api.ErrorRequest(c, err.Error())
+		return
+	}
+	// get article
+	id := c.Param("id")
+	artId, _ := strconv.Atoi(id)
+	_, err = models.ArticleGetById(artId)
+	if err != nil {
+		api.ErrorRequest(c, "Article not exists")
+		return
+	}
+	// check tags
+	var tagIds []int
+	for _, s := range strings.Split(form.Tags, ",") {
+		i, _ := strconv.Atoi(s)
+		tagIds = append(tagIds, i)
+	}
+	tags, err := models.TagGetByIds(tagIds)
+	if err != nil || len(tags) == 0 {
+		api.ErrorRequest(c, "Tags params failed")
+		return
+	}
+	if form.Keywords == "" {
+		var words []string
+		for _, tag := range tags {
+			words = append(words, tag.Name)
+		}
+		form.Keywords = strings.Join(words, ",")
+	}
+	if form.Type == models.ArticleTypeDefault {
+		form.Type = models.ArticleTypeMarkdown
+	}
 
+	// update article
+	article, err := models.ArticleUpdate(artId, map[string]interface{}{
+		"title":       form.Title,
+		"cover":       form.Cover,
+		"keywords":    form.Keywords,
+		"description": form.Description,
+		"content":     form.Content,
+		"type":        form.Type,
+		"tags":        tagIds,
+	})
+	if err != nil {
+		api.ErrorRequest(c, "Article update failed")
+		return
+	}
+	var articleTags []*ArticleTagResponse
+	for _, tag := range tags {
+		articleTags = append(articleTags, &ArticleTagResponse{
+			ID:   tag.ID,
+			Name: tag.Name,
+			Flag: tag.Flag,
+		})
+	}
+
+	api.Success(c, ArticleResponse{
+		ID:          article.ID,
+		CreatedAt:   article.CreatedAt,
+		UpdatedAt:   article.UpdatedAt,
+		Title:       article.Title,
+		Cover:       article.Cover,
+		Keywords:    article.Keywords,
+		Description: article.Description,
+		Content:     article.Content,
+		Type:        article.Type,
+		Tags:        articleTags,
+	})
 }
 
 func DeleteArticle(c *gin.Context) {

@@ -16,6 +16,7 @@ type Article struct {
 	View        int    `gorm:"default:0;" json:"view,omitempty"`
 	Status      int    `gorm:"default:1;comment: 1 enable 0 disable" json:"status,omitempty"`
 	Published   int    `gorm:"default:0;" json:"published,omitempty"`
+	PublishedAt int    `gorm:"" json:"published_at,omitempty"`
 }
 
 type ArticleTag struct {
@@ -30,19 +31,30 @@ const (
 	ArticleTypeHtml
 )
 
-func ArticleGetAll(pageNum, pageSize int, maps interface{}) ([]*Article, error) {
+func ArticleGetAll(pageNum, pageSize int, maps map[string]interface{}, sort string) ([]*Article, error) {
 	var articles []*Article
 	offset := (pageNum - 1) * pageSize
-	err := db.Where(maps).Offset(offset).Limit(pageSize).Find(&articles).Error
+	artDb := db.Model(&Article{})
+	for query, args := range maps {
+		artDb.Where(query, args)
+	}
+	if sort == "" {
+		sort = ""
+	}
+	err := artDb.Offset(offset).Limit(pageSize).Order(sort).Find(&articles).Error
 	if err != nil {
 		return nil, err
 	}
 	return articles, nil
 }
 
-func ArticleGetTotal(maps interface{}) (int, error) {
+func ArticleGetTotal(maps map[string]interface{}) (int, error) {
 	var total int64
-	err := db.Model(&Article{}).Where(maps).Count(&total).Error
+	artDb := db.Model(&Article{})
+	for query, args := range maps {
+		artDb.Where(query, args)
+	}
+	err := artDb.Count(&total).Error
 	if err != nil {
 		return 0, err
 	}
@@ -89,9 +101,42 @@ func ArticleAdd(data map[string]interface{}) (*Article, error) {
 	return article, nil
 }
 
+func ArticleUpdate(id int, data map[string]interface{}) (*Article, error) {
+	articleModify := Article{
+		Title:       data["title"].(string),
+		Cover:       data["cover"].(string),
+		Keywords:    data["keywords"].(string),
+		Description: data["description"].(string),
+		Content:     data["content"].(string),
+		Type:        data["type"].(int),
+	}
+	var tags []ArticleTag
+	for _, tagId := range data["tags"].([]int) {
+		tags = append(tags, ArticleTag{
+			ArticleId: uint(id),
+			TagId:     uint(tagId),
+		})
+	}
+	var article Article
+	db.First(&article, id)
+	db.Transaction(func(tx *gorm.DB) error {
+		if err := db.Where("article_id = ?", id).Delete(&ArticleTag{}).Error; err != nil {
+			return err
+		}
+		if err := tx.Model(&article).Updates(articleModify).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&tags).Error; err != nil {
+			return err
+		}
+		return nil
+	})
+	return &article, nil
+}
+
 func ArticleTagGetByArticleId(id int) ([]*Tag, error) {
 	var tags []*Tag
-	err := db.Model(&ArticleTag{}).Select("tags.id, tags.name, tags.flag").Joins("left join tags on article_tags.tag_id = tags.id").Where("article_tags.id = ?", id).Find(&tags).Error
+	err := db.Model(&ArticleTag{}).Select("tags.id, tags.name, tags.flag").Joins("left join tags on article_tags.tag_id = tags.id").Where("article_tags.article_id = ?", id).Find(&tags).Error
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +144,7 @@ func ArticleTagGetByArticleId(id int) ([]*Tag, error) {
 }
 
 func ArticleTagGetByArticleIds(ids []int) (map[int][]*Tag, error) {
-	rows, err := db.Model(&ArticleTag{}).Select("article_tags.article_id, tags.id, tags.name, tags.flag").Joins("left join tags on article_tags.tag_id = tags.id").Where("article_tags.id IN ?", ids).Rows()
+	rows, err := db.Model(&ArticleTag{}).Select("article_tags.article_id, tags.id, tags.name, tags.flag").Joins("left join tags on article_tags.tag_id = tags.id").Where("article_tags.article_id IN ?", ids).Rows()
 	fmt.Printf("rows: %+v\n", rows)
 	if err != nil {
 		return nil, err

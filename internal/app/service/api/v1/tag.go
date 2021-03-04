@@ -27,7 +27,11 @@ type TagResponse struct {
 
 func GetTags(c *gin.Context) {
 	p := api.NewPagination(c)
-	var maps map[string]interface{}
+	maps := make(map[string]interface{})
+	flag := c.Query("flag")
+	if flag != "" {
+		maps["flag LIKE ?"] = flag + "%"
+	}
 	total, err := models.TagGetTotal(maps)
 	if err != nil {
 		api.ErrorRequest(c, "Get tags failed")
@@ -58,6 +62,29 @@ func GetTags(c *gin.Context) {
 	}
 
 	api.SuccessPagination(c, r, p)
+}
+
+func GetSimpleTags(c *gin.Context) {
+	maps := make(map[string]interface{})
+	flag := c.Query("flag")
+	if flag != "" {
+		maps["flag LIKE ?"] = flag + "%"
+	}
+	tags, err := models.TagGetSimpleAll(maps)
+	if err != nil {
+		api.ErrorRequest(c, "Get tags failed")
+		return
+	}
+	var r []*TagResponse
+	for _, tag := range tags {
+		r = append(r, &TagResponse{
+			ID:   tag.ID,
+			Name: tag.Name,
+			Flag: tag.Flag,
+		})
+	}
+
+	api.Success(c, r)
 }
 
 func GetTag(c *gin.Context) {
@@ -116,18 +143,17 @@ func StoreTag(c *gin.Context) {
 }
 
 func UpdateTag(c *gin.Context) {
+	var form TagStoreRequest
+	var err error
+	if err = c.ShouldBind(&form); err != nil {
+		api.ErrorRequest(c, err.Error())
+		return
+	}
 	id := c.Param("id")
 	tagId, _ := strconv.Atoi(id)
-
-	var err error
 	tag, err := models.TagGetById(tagId)
 	if err != nil {
 		api.ErrorRequest(c, "Tag not exists")
-		return
-	}
-	var form TagStoreRequest
-	if err = c.ShouldBind(&form); err != nil {
-		api.ErrorRequest(c, err.Error())
 		return
 	}
 	if form.Flag != tag.Flag {

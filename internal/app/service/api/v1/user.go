@@ -13,14 +13,14 @@ type LoginRequest struct {
 }
 
 type UserResponse struct {
-	ID        uint   `json:"id"`
-	CreatedAt int    `json:"created_at"`
-	Name      string `json:"name"`
-	Avatar    string `json:"avatar"`
-	Email     string `json:"email"`
-	Phone     string `json:"phone"`
-	Type      int    `json:"type"`
-	Status    int    `json:"status"`
+	ID        uint     `json:"id"`
+	CreatedAt int      `json:"created_at"`
+	Name      string   `json:"name"`
+	Avatar    string   `json:"avatar"`
+	Email     string   `json:"email"`
+	Phone     string   `json:"phone"`
+	Status    int      `json:"status"`
+	Roles     []string `json:"roles"`
 }
 
 func Login(c *gin.Context) {
@@ -63,6 +63,11 @@ func LoginUserInfo(c *gin.Context) {
 		api.ErrorRequest(c, "User not exists")
 		return
 	}
+	// get user role
+	var roles []string
+	if user.Type == models.UserTypeAdmin {
+		roles = append(roles, "admin")
+	}
 
 	api.Success(c, UserResponse{
 		ID:        user.ID,
@@ -71,7 +76,7 @@ func LoginUserInfo(c *gin.Context) {
 		Avatar:    user.Avatar,
 		Email:     user.Email,
 		Phone:     user.Phone,
-		Type:      user.Type,
+		Roles:     roles,
 		Status:    user.Status,
 	})
 }

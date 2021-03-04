@@ -17,6 +17,11 @@ type User struct {
 	Status   int    `gorm:"comment:1 enable 0 inactive -1 disable" json:"status"`
 }
 
+const (
+	UserTypeAdmin  = -1
+	UserTypeNormal = 1
+)
+
 func UserGetByEmail(email string) (*User, error) {
 	var user User
 	err := db.Where("email = ?", email).First(&user).Error
