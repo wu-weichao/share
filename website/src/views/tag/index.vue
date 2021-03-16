@@ -41,8 +41,8 @@
       </el-table-column>
       <el-table-column :label="$t('table.status')" class-name="status-col" width="100">
         <template slot-scope="{row}">
-          <el-tag :type="row.status ? 'success' : 'info'">
-            {{ row.status ? '启用' : '禁用' }}
+          <el-tag :type="row.status == 1 ? 'success' : 'info'">
+            {{ row.status == 1 ? '启用' : '禁用' }}
           </el-tag>
         </template>
       </el-table-column>
@@ -70,6 +70,10 @@
         </el-form-item>
         <el-form-item :label="'描述'">
           <el-input v-model="temp.description" :autosize="{ minRows: 2, maxRows: 4}" type="textarea" placeholder="Please input" />
+        </el-form-item>
+        <el-form-item :label="'状态'" prop="status">
+          <el-radio v-model="temp.status" :label="1">启用</el-radio>
+          <el-radio v-model="temp.status" :label="-1">禁用</el-radio>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -120,7 +124,8 @@ export default {
         id: undefined,
         name: '',
         flag: '',
-        description: ''
+        description: '',
+        status: 1
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -132,7 +137,8 @@ export default {
       pvData: [],
       rules: {
         name: [{ required: true, message: 'name is required', trigger: 'blur' }],
-        flag: [{ required: true, message: 'flag is required', trigger: 'blur' }]
+        flag: [{ required: true, message: 'flag is required', trigger: 'blur' }],
+        status: [{ required: true, message: 'status is required', trigger: 'change' }]
       },
       downloadLoading: false
     }
@@ -160,11 +166,13 @@ export default {
         id: undefined,
         name: '',
         flag: '',
-        description: ''
+        description: '',
+        status: 1
       }
     },
     handleCreate() {
       this.resetTemp()
+      console.log(this.temp)
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
       this.$nextTick(() => {

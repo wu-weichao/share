@@ -12,6 +12,7 @@ type TagStoreRequest struct {
 	Flag        string `form:"flag" binding:"required"`
 	Icon        string `form:"icon"`
 	Description string `form:"description"`
+	Status      int    `form:"status"`
 }
 
 type TagResponse struct {
@@ -119,12 +120,16 @@ func StoreTag(c *gin.Context) {
 		api.ErrorRequest(c, "Tag is exists")
 		return
 	}
+	if form.Status == 0 {
+		form.Status = 1
+	}
 	// add tag
 	tag, err := models.TagAdd(map[string]interface{}{
 		"name":        form.Name,
 		"flag":        form.Flag,
 		"icon":        form.Icon,
 		"description": form.Description,
+		"Status":      form.Status,
 	})
 	if err != nil {
 		api.ErrorRequest(c, "Tag add failed")
@@ -162,13 +167,16 @@ func UpdateTag(c *gin.Context) {
 			return
 		}
 	}
-
-	_, err = models.TagUpdate(tagId, map[string]interface{}{
+	updateData := map[string]interface{}{
 		"name":        form.Name,
 		"flag":        form.Flag,
 		"icon":        form.Icon,
 		"description": form.Description,
-	})
+	}
+	if form.Status != 0 {
+		updateData["Status"] = form.Status
+	}
+	_, err = models.TagUpdate(tagId, updateData)
 	if err != nil {
 		api.ErrorRequest(c, "Tag Update failed")
 		return

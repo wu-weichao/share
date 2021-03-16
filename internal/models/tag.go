@@ -7,7 +7,7 @@ type Tag struct {
 	Flag        string `gorm:"index;size:50" json:"flag,omitempty"`
 	Icon        string `gorm:"size:512" json:"icon,omitempty"`
 	Description string `gorm:"size:512" json:"description,omitempty"`
-	Status      int    `gorm:"default:1;comment:1 enable 0 disable" json:"status,omitempty"`
+	Status      int    `gorm:"default:1;comment:1 enable -1 disable" json:"status,omitempty"`
 }
 
 func TagGetAll(pageNum, pageSize int, maps map[string]interface{}) ([]*Tag, error) {
@@ -92,15 +92,10 @@ func TagAdd(data map[string]interface{}) (*Tag, error) {
 }
 
 func TagUpdate(id int, data map[string]interface{}) (*Tag, error) {
-	tag := Tag{
-		Name:        data["name"].(string),
-		Flag:        data["flag"].(string),
-		Icon:        data["icon"].(string),
-		Description: data["description"].(string),
-	}
-	err := db.Model(&Tag{}).Select("name", "flag", "icon", "description", "status", "updated_at").Where("id = ?", id).Updates(tag).Error
+	tag, _ := TagGetById(id)
+	err := db.Model(&tag).Updates(data).Error
 	if err != nil {
 		return nil, err
 	}
-	return &tag, nil
+	return tag, nil
 }
