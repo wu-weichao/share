@@ -16,6 +16,7 @@ type ArticleRequest struct {
 	Description string `form:"description"`
 	Content     string `form:"content" binding:"required"`
 	Type        int    `form:"type" binding:"number"`
+	Published   int    `form:"published" binding:"number"`
 }
 
 type ArticleResponse struct {
@@ -180,6 +181,7 @@ func StoreArticle(c *gin.Context) {
 		"description": form.Description,
 		"content":     form.Content,
 		"type":        form.Type,
+		"published":   form.Published,
 		"tags":        tagIds,
 	})
 	if err != nil {
@@ -254,6 +256,7 @@ func UpdateArticle(c *gin.Context) {
 		"description": form.Description,
 		"content":     form.Content,
 		"type":        form.Type,
+		"published":   form.Published,
 		"tags":        tagIds,
 	})
 	if err != nil {

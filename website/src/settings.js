@@ -1,17 +1,17 @@
 module.exports = {
-  title: 'Vue Element Admin',
+  title: 'Share',
 
   /**
    * @type {boolean} true | false
    * @description Whether show the settings right-panel
    */
-  showSettings: true,
+  showSettings: false,
 
   /**
    * @type {boolean} true | false
    * @description Whether need tagsView
    */
-  tagsView: true,
+  tagsView: false,
 
   /**
    * @type {boolean} true | false
@@ -23,14 +23,14 @@ module.exports = {
    * @type {boolean} true | false
    * @description Whether show the logo in sidebar
    */
-  sidebarLogo: false,
+  sidebarLogo: true,
 
   /**
    * @type {boolean} true | false
    * @description Whether support pinyin search in headerSearch
    * Bundle size minified 47.3kb,minified + gzipped 63kb
    */
-  supportPinyinSearch: true,
+  supportPinyinSearch: false,
 
   /**
    * @type {string | array} 'production' | ['production', 'development']

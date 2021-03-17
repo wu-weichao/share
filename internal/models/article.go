@@ -3,6 +3,7 @@ package models
 import (
 	"fmt"
 	"gorm.io/gorm"
+	"time"
 )
 
 type Article struct {
@@ -78,6 +79,10 @@ func ArticleAdd(data map[string]interface{}) (*Article, error) {
 		Description: data["description"].(string),
 		Content:     data["content"].(string),
 		Type:        data["type"].(int),
+		Published:   data["published"].(int),
+	}
+	if article.Published == 1 {
+		article.PublishedAt = int(time.Now().Unix())
 	}
 	db.Transaction(func(tx *gorm.DB) error {
 		// add article
@@ -102,14 +107,6 @@ func ArticleAdd(data map[string]interface{}) (*Article, error) {
 }
 
 func ArticleUpdate(id int, data map[string]interface{}) (*Article, error) {
-	articleModify := Article{
-		Title:       data["title"].(string),
-		Cover:       data["cover"].(string),
-		Keywords:    data["keywords"].(string),
-		Description: data["description"].(string),
-		Content:     data["content"].(string),
-		Type:        data["type"].(int),
-	}
 	var tags []ArticleTag
 	for _, tagId := range data["tags"].([]int) {
 		tags = append(tags, ArticleTag{
@@ -117,13 +114,19 @@ func ArticleUpdate(id int, data map[string]interface{}) (*Article, error) {
 			TagId:     uint(tagId),
 		})
 	}
-	var article Article
-	db.First(&article, id)
+	delete(data, "tags")
+	article, err := ArticleGetById(id)
+	if err != nil {
+		return nil, err
+	}
+	if data["published"].(int) == 1 && article.PublishedAt == 0 {
+		article.PublishedAt = int(time.Now().Unix())
+	}
 	db.Transaction(func(tx *gorm.DB) error {
 		if err := db.Where("article_id = ?", id).Delete(&ArticleTag{}).Error; err != nil {
 			return err
 		}
-		if err := tx.Model(&article).Updates(articleModify).Error; err != nil {
+		if err := tx.Model(&article).Updates(data).Error; err != nil {
 			return err
 		}
 		if err := tx.Create(&tags).Error; err != nil {
@@ -131,7 +134,7 @@ func ArticleUpdate(id int, data map[string]interface{}) (*Article, error) {
 		}
 		return nil
 	})
-	return &article, nil
+	return article, nil
 }
 
 func ArticleTagGetByArticleId(id int) ([]*Tag, error) {
