@@ -41,7 +41,7 @@
 
       <el-table-column class-name="status-col" label="状态" width="110">
         <template slot-scope="{row}">
-          <el-tag :type="row.status | statusFilter">
+          <el-tag :type="row.published | statusFilter">
             {{ row.published ? '已发布' : '草稿' }}
           </el-tag>
         </template>
@@ -85,7 +85,7 @@ export default {
       listLoading: true,
       listQuery: {
         page: 1,
-        page_size: 20,
+        page_size: 10,
         sort: 'created_at desc'
       }
     }

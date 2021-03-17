@@ -2,10 +2,15 @@
   <div class="createPost-container">
     <el-form ref="postForm" :model="postForm" :rules="rules" class="form-container">
       <sticky :z-index="10" :class-name="'sub-navbar '+postForm.status">
-        <el-button v-loading="loading" style="margin-left: 10px;" type="success" @click="submitForm(1)">
+        <router-link :to="'/article/list'">
+          <el-button style="float: left; margin-top: 7px; margin-left: 20px;">
+            返回
+          </el-button>
+        </router-link>
+        <el-button v-if="postForm.published == 0" v-loading="loading" style="margin-left: 10px;" type="success" @click="submitForm(1)">
           发布
         </el-button>
-        <el-button v-loading="loading" type="warning" @click="draftForm">
+        <el-button v-if="postForm.published == 0" v-loading="loading" type="warning" @click="draftForm">
           保存草稿
         </el-button>
       </sticky>
@@ -136,15 +141,17 @@ export default {
   methods: {
     fetchData(id) {
       fetchArticle(id).then(response => {
+        const tags = []
+        if (response.data.tags) {
+          response.data.tags.forEach(item => {
+            tags.push(item.id)
+          })
+        }
+        response.data.tags = tags
         this.postForm = response.data
-
-        // just for test
-        this.postForm.title += `   Article Id:${this.postForm.id}`
-        this.postForm.content_short += `   Article Id:${this.postForm.id}`
-
+        console.log(this.postForm)
         // set tagsview title
         this.setTagsViewTitle()
-
         // set page title
         this.setPageTitle()
       }).catch(err => {
@@ -181,14 +188,6 @@ export default {
     },
     draftForm() {
       this.submitForm(0)
-      // createArticle().then().catch()
-      // this.$message({
-      //   message: '保存成功',
-      //   type: 'success',
-      //   showClose: true,
-      //   duration: 1000
-      // })
-      // this.postForm.status = 'draft'
     },
     createData(data) {
       this.loading = true

@@ -70,7 +70,7 @@ export default {
       //   this.editor.setValue(newValue)
       // }
       if (newValue !== preValue && newValue !== this.editor.getMarkdown()) {
-        this.editor.setValue(newValue)
+        this.editor.setMarkdown(newValue)
       }
     },
     language(val) {
