@@ -171,5 +171,18 @@ export default {
     tagsView: 'Open Tags-View',
     fixedHeader: 'Fixed Header',
     sidebarLogo: 'Sidebar Logo'
+  },
+  tag: {
+    flag: 'Flag',
+    name: 'Name',
+    description: 'Description'
+  },
+  common: {
+    enabled: 'Enabled',
+    disabled: 'Disabled',
+    success: 'Success',
+    createSuccess: 'Create Success',
+    updateSuccess: 'Update Success',
+    deleteSuccess: 'Delete Success'
   }
 }

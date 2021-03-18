@@ -1,17 +1,17 @@
 <template>
   <div class="createPost-container">
-    <el-form ref="postForm" :model="postForm" :rules="rules" class="form-container">
+    <el-form ref="postForm" :model="postForm" :rules="rules" label-suffix=":" class="form-container">
       <sticky :z-index="10" :class-name="'sub-navbar '+postForm.status">
         <router-link :to="'/article/list'">
           <el-button style="float: left; margin-top: 7px; margin-left: 20px;">
-            返回
+            {{ $t('common.back') }}
           </el-button>
         </router-link>
-        <el-button v-if="postForm.published == 0" v-loading="loading" style="margin-left: 10px;" type="success" @click="submitForm(1)">
-          发布
+        <el-button v-if="postForm.published != 1" v-loading="loading" style="margin-left: 10px;" type="success" @click="submitForm(1)">
+          {{ $t('table.publish') }}
         </el-button>
-        <el-button v-if="postForm.published == 0" v-loading="loading" type="warning" @click="draftForm">
-          保存草稿
+        <el-button v-if="postForm.published != 1" v-loading="loading" type="warning" @click="draftForm">
+          {{ $t('article.saveDraft') }}
         </el-button>
       </sticky>
 
@@ -20,7 +20,7 @@
           <el-col :span="24">
             <el-form-item style="margin-bottom: 40px;" prop="title">
               <MDinput v-model="postForm.title" :maxlength="100" name="name" required>
-                标题
+                {{ $t('table.title') }}
               </MDinput>
             </el-form-item>
           </el-col>
@@ -29,14 +29,14 @@
           <div class="postInfo-container">
             <el-row>
               <el-col :span="12">
-                <el-form-item label-width="60px" label="标签:" class="postInfo-container-item">
-                  <el-select v-model="postForm.tags" multiple placeholder="请选择" style="width: 300px;">
+                <el-form-item label-width="60px" :label="$t('article.tag')" class="postInfo-container-item">
+                  <el-select v-model="postForm.tags" multiple :placeholder="$t('common.pleaseChoose')" style="width: 300px;">
                     <el-option v-for="(item) in tagListOptions" :key="item.id" :label="item.name" :value="item.id" />
                   </el-select>
                 </el-form-item>
               </el-col>
               <el-col :span="12">
-                <el-form-item label-width="60px" label="SEO:" class="postInfo-container-item" style="width: 400px;">
+                <el-form-item label-width="60px" label="SEO" class="postInfo-container-item" style="width: 400px;">
                   <el-input v-model="postForm.keywords" />
                 </el-form-item>
               </el-col>
@@ -44,8 +44,8 @@
           </div>
         </el-row>
 
-        <el-form-item style="margin-bottom: 40px;" label-width="60px" label="摘要:">
-          <el-input v-model="postForm.description" :rows="1" type="textarea" class="article-textarea" autosize placeholder="请输入摘要" />
+        <el-form-item style="margin-bottom: 40px;" label-width="60px" :label="$t('article.description')">
+          <el-input v-model="postForm.description" :rows="1" type="textarea" class="article-textarea" autosize :placeholder="$t('common.pleaseEnter')" />
           <span v-show="descriptionLength" class="word-counter">{{ descriptionLength }}words</span>
         </el-form-item>
 
@@ -63,7 +63,6 @@
 
 <script>
 import MarkdownEditor from '@/components/MarkdownEditor'
-
 // import Upload from '@/components/Upload/SingleImage3'
 import MDinput from '@/components/MDinput'
 import Sticky from '@/components/Sticky' // 粘性header组件
@@ -96,25 +95,25 @@ export default {
     }
   },
   data() {
-    const validateRequire = (rule, value, callback) => {
-      if (value === '') {
-        this.$message({
-          message: rule.field + '为必传项',
-          type: 'error'
-        })
-        callback(new Error(rule.field + '为必传项'))
-      } else {
-        callback()
-      }
-    }
+    // const validateRequire = (rule, value, callback) => {
+    //   if (value === '') {
+    //     this.$message({
+    //       message: rule.field + '为必传项',
+    //       type: 'error'
+    //     })
+    //     callback(new Error(rule.field + '为必传项'))
+    //   } else {
+    //     callback()
+    //   }
+    // }
     return {
       postForm: Object.assign({}, defaultForm),
       loading: false,
       tagListOptions: [],
       rules: {
-        title: [{ validator: validateRequire }],
-        content: [{ validator: validateRequire }],
-        tags: [{ validator: validateRequire }]
+        title: [{ required: true, trigger: 'blur' }],
+        content: [{ required: true, trigger: 'blur' }],
+        tags: [{ required: true, trigger: 'change' }]
         // image_uri: [{ validator: validateRequire }],
         // source_uri: [{ validator: validateSourceUri, trigger: 'blur' }]
       },
@@ -149,7 +148,6 @@ export default {
         }
         response.data.tags = tags
         this.postForm = response.data
-        console.log(this.postForm)
         // set tagsview title
         this.setTagsViewTitle()
         // set page title
@@ -159,12 +157,12 @@ export default {
       })
     },
     setTagsViewTitle() {
-      const title = this.lang === 'zh' ? '编辑文章' : 'Edit Article'
+      const title = this.$t('route.editArticle')
       const route = Object.assign({}, this.tempRoute, { title: `${title}-${this.postForm.id}` })
       this.$store.dispatch('tagsView/updateVisitedView', route)
     },
     setPageTitle() {
-      const title = this.lang === 'zh' ? '编辑文章' : 'Edit Article'
+      const title = this.$t('route.editArticle')
       document.title = `${title} - ${this.postForm.id}`
     },
     submitForm(published) {
@@ -194,15 +192,18 @@ export default {
       createArticle(data).then(() => {
         this.loading = false
         this.$message({
-          message: data.published ? '发布成功' : '保存成功',
+          message: this.$t(data.published ? 'common.publishSuccess' : 'common.saveSuccess'),
           type: 'success',
           showClose: true,
           duration: 1000
         })
+        if (data.published) {
+          this.$router.push('/article/list')
+        }
       }).catch(() => {
         this.loading = false
         this.$message({
-          message: '操作失败',
+          message: this.$t('common.operationFailed'),
           type: 'error',
           showClose: true,
           duration: 2000
@@ -214,15 +215,18 @@ export default {
       updateArticle(data.id, data).then(() => {
         this.loading = false
         this.$message({
-          message: data.published ? '发布成功' : '保存成功',
+          message: this.$t(data.published ? 'common.publishSuccess' : 'common.saveSuccess'),
           type: 'success',
           showClose: true,
           duration: 1000
         })
+        if (data.published) {
+          this.$router.push('/article/list')
+        }
       }).catch(() => {
         this.loading = false
         this.$message({
-          message: '操作失败',
+          message: this.$t('common.operationFailed'),
           type: 'error',
           showClose: true,
           duration: 2000

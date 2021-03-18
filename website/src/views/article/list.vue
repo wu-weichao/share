@@ -1,5 +1,19 @@
 <template>
   <div class="app-container">
+    <div class="filter-container">
+      <el-select v-model="listQuery.tags" multiple :placeholder="$t('common.pleaseChoose')" style="width: 300px;margin-right: 10px;" class="filter-item">
+        <el-option v-for="(item) in tagListOptions" :key="item.id" :label="item.name" :value="item.id" />
+      </el-select>
+      <el-button v-waves class="filter-item" icon="el-icon-search" @click="handleFilter">
+        {{ $t('table.search') }}
+      </el-button>
+      <router-link :to="'/article/create'">
+        <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit">
+          {{ $t('table.add') }}
+        </el-button>
+      </router-link>
+    </div>
+
     <el-table v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%">
       <el-table-column align="center" label="ID" width="80">
         <template slot-scope="scope">
@@ -7,27 +21,27 @@
         </template>
       </el-table-column>
 
-      <el-table-column min-width="300px" label="标题">
-        <template slot-scope="{row}">
-          <router-link :to="'/article/edit/'+row.id" class="link-type">
-            <span>{{ row.title }}</span>
+      <el-table-column min-width="300px" :label="$t('table.title')">
+        <template slot-scope="scope">
+          <router-link :to="'/article/edit/'+scope.row.id" class="link-type">
+            <span>{{ scope.row.title }}</span>
           </router-link>
         </template>
       </el-table-column>
 
-      <el-table-column width="140px" align="center" label="创建时间">
+      <el-table-column width="140px" align="center" :label="$t('common.createdAt')">
         <template slot-scope="scope">
           <span>{{ scope.row.created_at | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column width="140px" align="center" label="更新时间">
+      <el-table-column width="140px" align="center" :label="$t('common.updatedAt')">
         <template slot-scope="scope">
           <span>{{ scope.row.updated_at | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column width="120px" align="center" label="标签">
+      <el-table-column width="120px" align="center" :label="$t('article.tag')">
         <template slot-scope="scope">
           <span>{{ getTagNames(scope.row.tags) }}</span>
         </template>
@@ -39,21 +53,34 @@
         </template>
       </el-table-column> -->
 
-      <el-table-column class-name="status-col" label="状态" width="110">
-        <template slot-scope="{row}">
-          <el-tag :type="row.published | statusFilter">
-            {{ row.published ? '已发布' : '草稿' }}
+      <el-table-column class-name="status-col" :label="$t('table.status')" width="110">
+        <template slot-scope="scope">
+          <el-tag :type="scope.row.published | statusFilter">
+            {{ scope.row.published ? $t('article.published') : $t('table.draft') }}
           </el-tag>
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="Actions" width="120">
+      <el-table-column class-name="status-col" :label="$t('article.view')" width="100">
+        <template slot-scope="scope">
+          <span>{{ scope.row.view }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column align="center" :label="$t('table.actions')" width="180">
         <template slot-scope="scope">
           <router-link :to="'/article/edit/'+scope.row.id">
-            <el-button type="primary" size="small" icon="el-icon-edit">
-              编辑
+            <el-button type="primary" size="small">
+              {{ $t('table.edit') }}
             </el-button>
           </router-link>
+
+          <el-popconfirm v-if="scope.row.published" placement="top" title="确定下架文章吗？" @onConfirm="articlePublishHandle(scope.row)">
+            <el-button slot="reference" type="warning" size="small" style="margin-left: 10px;">{{ $t('article.unpublish') }}</el-button>
+          </el-popconfirm>
+          <el-popconfirm v-else placement="top" title="确定发布文章吗？" @onConfirm="articlePublishHandle(scope.row)">
+            <el-button slot="reference" type="success" size="small" style="margin-left: 10px;">{{ $t('table.publish') }}</el-button>
+          </el-popconfirm>
         </template>
       </el-table-column>
     </el-table>
@@ -63,12 +90,15 @@
 </template>
 
 <script>
-import { fetchList } from '@/api/article'
+import { fetchList, publishArticle, unpublishArticle } from '@/api/article'
+import { fetchSelectList } from '@/api/tag'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
+import waves from '@/directive/waves' // waves directive
 
 export default {
   name: 'ArticleList',
   components: { Pagination },
+  directives: { waves },
   filters: {
     statusFilter(status) {
       const statusMap = {
@@ -83,25 +113,45 @@ export default {
       list: null,
       total: 0,
       listLoading: true,
+      tagListOptions: [],
       listQuery: {
         page: 1,
         page_size: 10,
+        tags: [],
         sort: 'created_at desc'
       }
     }
   },
   created() {
     this.getList()
+    this.getTagList()
   },
   methods: {
     // TODO: 确认显示字段，及编辑操作
     getList() {
       this.listLoading = true
-      fetchList(this.listQuery).then(response => {
+      const query = Object.assign({}, this.listQuery)
+      if (query.tags.length > 0) {
+        query.tags = query.tags.join(',')
+      }
+      fetchList(query).then(response => {
         this.list = response.data.list
         this.total = response.data.pagination.total
         this.listLoading = false
       })
+    },
+    getTagList(query) {
+      query = query || {}
+      fetchSelectList(query).then(response => {
+        if (!response.data) return
+        this.tagListOptions = response.data.map(v => {
+          return { id: v.id, name: v.name }
+        })
+      })
+    },
+    handleFilter() {
+      this.listQuery.page = 1
+      this.getList()
     },
     getTagNames(tags) {
       tags = tags || []
@@ -110,6 +160,27 @@ export default {
         names.push(v.name)
       })
       return names.join(',')
+    },
+    articlePublishHandle(recode) {
+      if (recode.published) {
+        unpublishArticle(recode.id).then(() => {
+          recode.published = 0
+          this.$message({
+            message: this.$t('common.unpublishSuccess'),
+            type: 'success',
+            duration: 1000
+          })
+        })
+      } else {
+        publishArticle(recode.id).then(() => {
+          recode.published = 1
+          this.$message({
+            message: this.$t('common.publishSuccess'),
+            type: 'success',
+            duration: 1000
+          })
+        })
+      }
     }
   }
 }

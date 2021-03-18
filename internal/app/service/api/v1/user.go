@@ -55,6 +55,10 @@ func Login(c *gin.Context) {
 	})
 }
 
+func Logout(c *gin.Context) {
+	api.Success(c, nil)
+}
+
 func LoginUserInfo(c *gin.Context) {
 	// get login user
 	jwtUser, _ := c.Get("user")

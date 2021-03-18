@@ -27,6 +27,7 @@ type ArticleResponse struct {
 	Description string `json:"description"`
 	Content     string `json:"content"`
 	Type        int    `json:"type"`
+	View        int    `json:"view"`
 	Published   int    `json:"published"`
 	CreatedAt   int    `json:"created_at"`
 	UpdatedAt   int    `json:"updated_at"`
@@ -43,7 +44,20 @@ type ArticleTagResponse struct {
 
 func GetArticles(c *gin.Context) {
 	p := api.NewPagination(c)
-	var maps map[string]interface{}
+	maps := make(map[string]interface{})
+	tags := c.Query("tags")
+	if tags != "" {
+		var tagIds []int
+		for _, s := range strings.Split(tags, ",") {
+			i, _ := strconv.Atoi(s)
+			tagIds = append(tagIds, i)
+		}
+		articleIds, err := models.ArticleIdGetByTagIds(tagIds)
+		if err != nil {
+			api.ErrorRequest(c, "Get Articles failed")
+		}
+		maps["id IN ?"] = articleIds
+	}
 	total, err := models.ArticleGetTotal(maps)
 	if err != nil {
 		api.ErrorRequest(c, "Get Articles failed")
@@ -90,6 +104,7 @@ func GetArticles(c *gin.Context) {
 			Description: article.Description,
 			//Content:     article.Content,
 			Type:        article.Type,
+			View:        article.View,
 			Published:   article.Published,
 			CreatedAt:   article.CreatedAt,
 			UpdatedAt:   article.UpdatedAt,
@@ -288,4 +303,24 @@ func UpdateArticle(c *gin.Context) {
 
 func DeleteArticle(c *gin.Context) {
 
+}
+
+func PublishArticle(c *gin.Context) {
+	id := c.Param("id")
+	artId, _ := strconv.Atoi(id)
+	if models.ArticlePublish(artId, 1) == false {
+		api.ErrorRequest(c, "Article publish failed")
+		return
+	}
+	api.Success(c, nil)
+}
+
+func UnpublishArticle(c *gin.Context) {
+	id := c.Param("id")
+	artId, _ := strconv.Atoi(id)
+	if models.ArticlePublish(artId, 0) == false {
+		api.ErrorRequest(c, "Article unpublish failed")
+		return
+	}
+	api.Success(c, nil)
 }

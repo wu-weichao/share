@@ -133,6 +133,7 @@ export default {
     actions: '操作',
     edit: '编辑',
     publish: '发布',
+    unpublish: '取消发布',
     draft: '草稿',
     delete: '删除',
     cancel: '取 消',
@@ -175,5 +176,36 @@ export default {
     tagsView: '开启 Tags-View',
     fixedHeader: '固定 Header',
     sidebarLogo: '侧边栏 Logo'
+  },
+  common: {
+    back: '返回',
+    pleaseEnter: '请输入',
+    pleaseChoose: '请选择',
+    enabled: '启用',
+    disabled: '禁用',
+    success: '成功',
+    createSuccess: '创建成功',
+    saveSuccess: '保存成功',
+    updateSuccess: '更新成功',
+    deleteSuccess: '删除成功',
+    publishSuccess: '发布成功',
+    unpublishSuccess: '下架成功',
+    operationFailed: '操作失败',
+    createdAt: '创建时间',
+    updatedAt: '更新时间'
+  },
+  tag: {
+    flag: '标识',
+    name: '名称',
+    description: '描述'
+  },
+  article: {
+    tag: '标签',
+    published: '已发布',
+    saveDraft: '保存草稿',
+    description: '摘要',
+    unpublish: '下架',
+    view: '阅读量'
   }
+
 }

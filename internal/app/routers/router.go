@@ -7,9 +7,8 @@ import (
 	"net/http"
 	"path/filepath"
 	"share/internal/app/middleware"
+	v1 "share/internal/app/service/api/v1"
 
-	//"share/internal/app/middleware"
-	"share/internal/app/service/api/v1"
 	"share/internal/app/service/web"
 )
 
@@ -22,6 +21,7 @@ func InitRouter() *gin.Engine {
 
 	// templates
 	r.HTMLRender = loadTemplates("../../web/template/blog")
+	//r.SetFuncMap()
 
 	// static
 	r.StaticFS("/static", http.Dir("../../web/static"))
@@ -34,7 +34,7 @@ func InitRouter() *gin.Engine {
 	apiv1 := r.Group("/api/v1")
 	{
 		apiv1.POST("/login", v1.Login)
-		//apiv1.POST("/logout")
+		apiv1.POST("/logout", v1.Logout)
 
 		// with auth token
 		apiv1WithAuth := apiv1.Group("")
@@ -54,12 +54,15 @@ func InitRouter() *gin.Engine {
 			apiv1WithAuth.POST("/articles", v1.StoreArticle)
 			apiv1WithAuth.PUT("/articles/:id", v1.UpdateArticle)
 			apiv1WithAuth.DELETE("/articles/:id")
+			apiv1WithAuth.PUT("/articles/:id/publish", v1.PublishArticle)
+			apiv1WithAuth.PUT("/articles/:id/unpublish", v1.UnpublishArticle)
 		}
 	}
 	// frontend group
 	front := r.Group("/blog")
 	{
 		front.GET("/", web.Homepage)
+		front.GET("/page/:num", web.Homepage)
 	}
 
 	return r

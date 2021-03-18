@@ -5,53 +5,53 @@ html,body {
 .layout {
     background: #f0f2f5;
 }
-.header {
+.layout-header {
     height: 64px;
     padding: 0 50px;
     line-height: 64px;
     box-shadow: 0 2px 8px rgb(0 0 0 / 15%);
     background: #fff;
 }
-.header-box {
+.layout-header .header-box {
     margin: auto;
     max-width: 1400px;
     display: flex;
     justify-content: space-between;
 }
-.header .logo {
+.layout-header .logo {
     display: flex;
     align-items: center;
     min-width: 50px;
 }
-.header .logo img {
+.layout-header .logo img {
     width: 32px;
     height: 32px;
     border-radius: 50%;
 }
-.header .logo h1 {
+.layout-header .logo h1 {
     font-size: 20px;
     margin: 0 0 0 12px;
 }
-.header .topic {
+.layout-header .topic {
     flex: 1;
     margin-left: 50px;
     display: flex;
 }
-.header .topic>div {
+.layout-header .topic>div {
     padding: 0 15px;
     font-size: 16px;
 }
-.header .topic>div:hover {
+.layout-header .topic>div:hover {
     color: #13c2c2;
     cursor: pointer;
 }
-.header .topic>div.active {
+.layout-header .topic>div.active {
     color: #13c2c2;
 }
-.header .avatar {
+.layout-header .avatar {
 
 }
-.container {
+.layout-container {
     min-height: calc(100vh - 200px);
     padding: 20px 50px 20px;
     display: flex;
@@ -59,27 +59,60 @@ html,body {
     max-width: 1400px;
     margin: auto;
 }
-.container .content {
-    padding: 30px 20px;
-    background-color: #ffffff;
-    flex: 1;
-    border-radius: 5px;
-}
-.container .content .article{
-    max-width: 900px;
-    margin: 0 auto;
-}
-.container .information {
-    display: flex;
-}
-.footer {
+.layout-footer {
     font-size: 14px;
     color: rgba(0, 0, 0, 0.65);
     padding: 24px 16px;
     text-align: center;
 }
+
+.layout-container .layout-container-content, .layout-container .layout-container-exception {
+    padding: 30px 20px;
+    background-color: #ffffff;
+    flex: 1;
+    border-radius: 5px;
+}
+.layout-container .layout-container-information {
+    display: flex;
+}
+/*.layout-container .layout-container-content .article{*/
+/*    max-width: 900px;*/
+/*    margin: 0 auto;*/
+/*}*/
+/***** exception page css *****/
+.layout-container .layout-container-exception {
+    display: flex;
+    justify-content: center;
+}
+.layout-container-exception .exception-page {
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #fff;
+}
+.layout-container-exception .exception-page .img{
+    padding-right: 52px;
+    zoom: 1;
+}
+.layout-container-exception .exception-page .img img{
+    max-width: 430px;
+}
+.layout-container-exception .exception-page .content h1{
+    color: #434e59;
+    font-size: 72px;
+    font-weight: 600;
+    line-height: 72px;
+    margin-bottom: 24px;
+}
+.layout-container-exception .exception-page .content .desc{
+    color: rgba(0,0,0,.45);
+    font-size: 20px;
+    line-height: 28px;
+    margin-bottom: 16px;
+}
 @media screen and (max-width: 800px) {
-    .header .logo h1{
+    .layout-header .logo h1{
         display: none;
     }
 }

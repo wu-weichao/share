@@ -2,7 +2,7 @@
   <div class="app-container">
     <div class="filter-container">
       <el-input v-model="listQuery.flag" clearable :placeholder="'标识'" style="width: 200px;margin-right: 10px;" class="filter-item" @keyup.enter.native="handleFilter" />
-      <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
+      <el-button v-waves class="filter-item" icon="el-icon-search" @click="handleFilter">
         {{ $t('table.search') }}
       </el-button>
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
@@ -19,17 +19,17 @@
       highlight-current-row
       style="width: 100%;"
     >
-      <el-table-column :label="'标识'" prop="flag" align="center" width="100">
+      <el-table-column :label="$t('tag.flag')" prop="flag" align="center" width="100">
         <template slot-scope="{row}">
           <span>{{ row.flag }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="'名称'" prop="name" align="center" width="150">
+      <el-table-column :label="$t('tag.name')" prop="name" align="center" width="150">
         <template slot-scope="{row}">
           <span>{{ row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="'描述'" prop="description" align="center">
+      <el-table-column :label="$t('tag.description')" prop="description" align="center">
         <template slot-scope="{row}">
           <span>{{ row.description }}</span>
         </template>
@@ -42,7 +42,7 @@
       <el-table-column :label="$t('table.status')" class-name="status-col" width="100">
         <template slot-scope="{row}">
           <el-tag :type="row.status == 1 ? 'success' : 'info'">
-            {{ row.status == 1 ? '启用' : '禁用' }}
+            {{ row.status == 1 ? $t('common.enabled') : $t('common.disabled') }}
           </el-tag>
         </template>
       </el-table-column>
@@ -61,19 +61,19 @@
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.page_size" @pagination="getList" />
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
-        <el-form-item :label="'名称'" prop="name">
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="padding: 0 20px;">
+        <el-form-item :label="$t('tag.name')" prop="name">
           <el-input v-model="temp.name" />
         </el-form-item>
-        <el-form-item :label="'标识'" prop="flag">
+        <el-form-item :label="$t('tag.flag')" prop="flag">
           <el-input v-model="temp.flag" />
         </el-form-item>
-        <el-form-item :label="'描述'">
+        <el-form-item :label="$t('tag.description')">
           <el-input v-model="temp.description" :autosize="{ minRows: 2, maxRows: 4}" type="textarea" placeholder="Please input" />
         </el-form-item>
-        <el-form-item :label="'状态'" prop="status">
-          <el-radio v-model="temp.status" :label="1">启用</el-radio>
-          <el-radio v-model="temp.status" :label="-1">禁用</el-radio>
+        <el-form-item :label="$t('table.status')" prop="status">
+          <el-radio v-model="temp.status" :label="1">{{ $t('common.enabled') }}</el-radio>
+          <el-radio v-model="temp.status" :label="-1">{{ $t('common.disabled') }}</el-radio>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -130,8 +130,8 @@ export default {
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
-        update: '编辑',
-        create: '添加'
+        update: this.$t('table.edit'),
+        create: this.$t('table.add')
       },
       dialogPvVisible: false,
       pvData: [],
@@ -186,8 +186,8 @@ export default {
             this.dialogFormVisible = false
             this.getList()
             this.$notify({
-              title: '成功',
-              message: '创建成功',
+              title: this.$t('common.success'),
+              message: this.$t('common.createSuccess'),
               type: 'success',
               duration: 2000
             })
@@ -211,8 +211,8 @@ export default {
             this.getList()
             this.dialogFormVisible = false
             this.$notify({
-              title: '成功',
-              message: '更新成功',
+              title: this.$t('common.success'),
+              message: this.$t('common.updateSuccess'),
               type: 'success',
               duration: 2000
             })
@@ -222,8 +222,8 @@ export default {
     },
     handleDelete(row, index) {
       this.$notify({
-        title: '成功',
-        message: '删除成功',
+        title: this.$t('common.success'),
+        message: this.$t('common.deleteSuccess'),
         type: 'success',
         duration: 2000
       })

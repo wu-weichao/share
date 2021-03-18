@@ -1,15 +1,17 @@
 {{ define "content" }}
 
-<div class="content">
-    {{ range .posts}}
-        <div>{{ .title }}</div>
+<div class="layout-container-content">
+    {{ range .articles}}
+        <div>{{ .Title }}</div>
         <div>
-            <div>{{ .create_at }}</div>
-            <div>{{ .tags }}</div>
-            <div>{{ .views }}</div>
+            <div>{{ .PublishedAt }}</div>
+{{/*            <div>{{ .Tags }}</div>*/}}
+            <div>{{ .View }}</div>
         </div>
-        <div>{{ .intro }}</div>
+        <div>{{ .Description }}</div>
     {{ end }}
+    {{ .total }}
+    {{ .page }}
+    {{ .pageSize }}
 </div>
-
 {{ end }}

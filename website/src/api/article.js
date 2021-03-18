@@ -30,3 +30,17 @@ export function updateArticle(id, data) {
     data
   })
 }
+
+export function publishArticle(id) {
+  return request({
+    url: 'articles/' + id + '/publish',
+    method: 'put'
+  })
+}
+
+export function unpublishArticle(id) {
+  return request({
+    url: 'articles/' + id + '/unpublish',
+    method: 'put'
+  })
+}

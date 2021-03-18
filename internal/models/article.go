@@ -1,7 +1,6 @@
 package models
 
 import (
-	"fmt"
 	"gorm.io/gorm"
 	"time"
 )
@@ -42,7 +41,7 @@ func ArticleGetAll(pageNum, pageSize int, maps map[string]interface{}, sort stri
 	if sort == "" {
 		sort = ""
 	}
-	err := artDb.Offset(offset).Limit(pageSize).Order(sort).Find(&articles).Error
+	err := artDb.Select("id", "created_at", "updated_at", "title", "cover", "keywords", "description", "type", "view", "status", "published", "published_at").Offset(offset).Limit(pageSize).Order(sort).Find(&articles).Error
 	if err != nil {
 		return nil, err
 	}
@@ -137,6 +136,33 @@ func ArticleUpdate(id int, data map[string]interface{}) (*Article, error) {
 	return article, nil
 }
 
+func ArticlePublish(id int, publish int) bool {
+	article, err := ArticleGetById(id)
+	if err != nil {
+		return false
+	}
+	if article.Published == publish {
+		return true
+	}
+	article.Published = publish
+	if article.PublishedAt == 0 {
+		article.PublishedAt = int(time.Now().Unix())
+	}
+	if db.Save(article).Error != nil {
+		return false
+	}
+	return true
+}
+
+func ArticleIdGetByTagIds(ids []int) ([]int, error) {
+	var articleIds []int
+	err := db.Model(&ArticleTag{}).Where("tag_id IN ?", ids).Distinct().Pluck("article_id", &articleIds).Error
+	if err != nil {
+		return nil, err
+	}
+	return articleIds, nil
+}
+
 func ArticleTagGetByArticleId(id int) ([]*Tag, error) {
 	var tags []*Tag
 	err := db.Model(&ArticleTag{}).Select("tags.id, tags.name, tags.flag").Joins("left join tags on article_tags.tag_id = tags.id").Where("article_tags.article_id = ?", id).Find(&tags).Error
@@ -148,10 +174,10 @@ func ArticleTagGetByArticleId(id int) ([]*Tag, error) {
 
 func ArticleTagGetByArticleIds(ids []int) (map[int][]*Tag, error) {
 	rows, err := db.Model(&ArticleTag{}).Select("article_tags.article_id, tags.id, tags.name, tags.flag").Joins("left join tags on article_tags.tag_id = tags.id").Where("article_tags.article_id IN ?", ids).Rows()
-	fmt.Printf("rows: %+v\n", rows)
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
 	row := map[string]interface{}{
 		"article_id": 0,
 	}
@@ -159,13 +185,11 @@ func ArticleTagGetByArticleIds(ids []int) (map[int][]*Tag, error) {
 	for rows.Next() {
 		err = db.ScanRows(rows, row)
 		if err != nil {
-			rows.Close()
 			return nil, err
 		}
 		tag := Tag{}
 		err = db.ScanRows(rows, &tag)
 		if err != nil {
-			rows.Close()
 			return nil, err
 		}
 		artId := int(row["article_id"].(int64))
