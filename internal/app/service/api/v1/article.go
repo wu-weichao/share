@@ -13,7 +13,7 @@ type ArticleRequest struct {
 	Title       string `form:"title" binding:"required"`
 	Cover       string `form:"cover"`
 	Keywords    string `form:"keywords"`
-	Description string `form:"description"`
+	Description string `form:"description" binding:"required"`
 	Content     string `form:"content" binding:"required"`
 	Type        int    `form:"type" binding:"number"`
 	Published   int    `form:"published" binding:"number"`
@@ -159,7 +159,6 @@ func GetArticle(c *gin.Context) {
 
 }
 
-// TODO: 增加发布状态管理
 func StoreArticle(c *gin.Context) {
 	var form ArticleRequest
 	var err error
@@ -322,5 +321,7 @@ func UnpublishArticle(c *gin.Context) {
 		api.ErrorRequest(c, "Article unpublish failed")
 		return
 	}
+	//TODO: remove html
+
 	api.Success(c, nil)
 }

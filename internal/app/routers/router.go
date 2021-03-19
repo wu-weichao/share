@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"github.com/gin-contrib/multitemplate"
 	"github.com/gin-gonic/gin"
+	"html/template"
 	"net/http"
 	"path/filepath"
 	"share/internal/app/middleware"
 	v1 "share/internal/app/service/api/v1"
-
 	"share/internal/app/service/web"
+	"share/pkg/html/funcs"
 )
 
 func InitRouter() *gin.Engine {
@@ -21,7 +22,6 @@ func InitRouter() *gin.Engine {
 
 	// templates
 	r.HTMLRender = loadTemplates("../../web/template/blog")
-	//r.SetFuncMap()
 
 	// static
 	r.StaticFS("/static", http.Dir("../../web/static"))
@@ -70,6 +70,13 @@ func InitRouter() *gin.Engine {
 
 func loadTemplates(templatesDir string) multitemplate.Renderer {
 	r := multitemplate.NewRenderer()
+	// template functions
+	funcMap := template.FuncMap{
+		"unixToDateTime": funcs.UnixToDateTime,
+		"unixToDate":     funcs.UnixToDate,
+		"unixToFormat":   funcs.UnixToFormat,
+		"implode":        funcs.Implode,
+	}
 
 	layouts, err := filepath.Glob(templatesDir + "/layouts/*.tmpl")
 	if err != nil {
@@ -86,7 +93,7 @@ func loadTemplates(templatesDir string) multitemplate.Renderer {
 		layoutCopy := make([]string, len(layouts))
 		copy(layoutCopy, layouts)
 		files := append(layoutCopy, view)
-		r.AddFromFiles(filepath.Base(view), files...)
+		r.AddFromFilesFuncs(filepath.Base(view), funcMap, files...)
 	}
 	return r
 }

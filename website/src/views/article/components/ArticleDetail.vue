@@ -29,7 +29,7 @@
           <div class="postInfo-container">
             <el-row>
               <el-col :span="12">
-                <el-form-item label-width="60px" :label="$t('article.tag')" class="postInfo-container-item">
+                <el-form-item prop="tags" label-width="60px" :label="$t('article.tag')" class="postInfo-container-item">
                   <el-select v-model="postForm.tags" multiple :placeholder="$t('common.pleaseChoose')" style="width: 300px;">
                     <el-option v-for="(item) in tagListOptions" :key="item.id" :label="item.name" :value="item.id" />
                   </el-select>
@@ -44,7 +44,7 @@
           </div>
         </el-row>
 
-        <el-form-item style="margin-bottom: 40px;" label-width="60px" :label="$t('article.description')">
+        <el-form-item prop="description" style="margin-bottom: 40px;" label-width="60px" :label="$t('article.description')">
           <el-input v-model="postForm.description" :rows="1" type="textarea" class="article-textarea" autosize :placeholder="$t('common.pleaseEnter')" />
           <span v-show="descriptionLength" class="word-counter">{{ descriptionLength }}words</span>
         </el-form-item>
@@ -113,8 +113,8 @@ export default {
       rules: {
         title: [{ required: true, trigger: 'blur' }],
         content: [{ required: true, trigger: 'blur' }],
-        tags: [{ required: true, trigger: 'change' }]
-        // image_uri: [{ validator: validateRequire }],
+        tags: [{ required: true, trigger: 'change' }],
+        description: [{ required: true, trigger: 'change' }]
         // source_uri: [{ validator: validateSourceUri, trigger: 'blur' }]
       },
       tempRoute: {},
@@ -199,6 +199,10 @@ export default {
         })
         if (data.published) {
           this.$router.push('/article/list')
+        } else {
+          // TODO 传参跳转至编辑页面
+
+          this.$router.push('/article/edit', {})
         }
       }).catch(() => {
         this.loading = false

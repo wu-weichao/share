@@ -34,6 +34,14 @@ type JwtConfig struct {
 
 var Jwt = &JwtConfig{}
 
+type HtmlConfig struct {
+	Title       string `mapstructure:"title"`
+	Keywords    string `mapstructure:"keywords"`
+	Description string `mapstructure:"description"`
+}
+
+var Html = &HtmlConfig{}
+
 var once sync.Once
 
 func init() {
@@ -49,6 +57,7 @@ func init() {
 		}
 		viper.UnmarshalKey("app", App)
 		viper.UnmarshalKey("jwt", Jwt)
+		viper.UnmarshalKey("html", Html)
 		// load database.yaml
 		viper.SetConfigName("database")
 		err = viper.ReadInConfig()

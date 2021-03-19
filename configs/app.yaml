@@ -5,3 +5,7 @@ app:
 jwt:
   secret: wuweichao.com
   ttl: 43200
+html:
+  title: Share
+  keywords: Share,Golang,Blog
+  description: a minimalist style blog base on golang

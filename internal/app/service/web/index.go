@@ -6,6 +6,17 @@ import (
 	"strconv"
 )
 
+type Article struct {
+	ID          uint   `json:"id"`
+	Title       string `json:"title"`
+	Cover       string `json:"cover"`
+	Description string `json:"description"`
+	View        int    `json:"view"`
+	PublishedAt int    `json:"published_at"`
+
+	Tags []string
+}
+
 func Homepage(c *gin.Context) {
 	var page int
 	var pageSize int = 10
@@ -19,45 +30,51 @@ func Homepage(c *gin.Context) {
 	maps := map[string]interface{}{
 		"published = ?": 1,
 	}
-	total, err := models.ArticleGetTotal(maps)
-	if err != nil {
+	var total int
+	var articles []*models.Article
+	var articleList []*Article
+	var err error
+	if total, err = models.ArticleGetTotal(maps); err != nil {
 		View500(c)
 		return
 	}
-	if total == 0 {
-		View404(c)
-		return
+	if total > 0 {
+		if articles, err = models.ArticleGetAll(page, pageSize, maps, "published_at desc"); err != nil {
+			View500(c)
+			return
+		}
+		if len(articles) > 0 {
+			var articleIds []int
+			for _, article := range articles {
+				articleIds = append(articleIds, int(article.ID))
+			}
+			articleTags, err := models.ArticleTagGetByArticleIds(articleIds)
+			if err != nil {
+				View500(c)
+				return
+			}
+			for _, article := range articles {
+				item := &Article{
+					ID:          article.ID,
+					Title:       article.Title,
+					Cover:       article.Cover,
+					Description: article.Description,
+					View:        article.View,
+					PublishedAt: article.PublishedAt,
+				}
+				if tags, ok := articleTags[int(article.ID)]; ok {
+					for _, tag := range tags {
+						item.Tags = append(item.Tags, tag.Name)
+					}
+				}
+				articleList = append(articleList, item)
+			}
+		}
 	}
-	articles, err := models.ArticleGetAll(page, pageSize, maps, "published_at desc")
-	if err != nil {
-		View500(c)
-		return
-	}
-
-	//for _, article := range articles {
-	//
-	//}
-
 	View(c, "home.tmpl", gin.H{
-		"articles": articles,
+		"articles": articleList,
 		"total":    total,
 		"page":     page,
 		"pageSize": pageSize,
 	})
-	//[]map[string]interface{}{
-	//	{
-	//		"title":     "文章1",
-	//		"create_at": "2020-02-26",
-	//		"views":     100,
-	//		"tags":      "golang",
-	//		"intro":     "xxxxxxxxxxxxxxxxxx",
-	//	},
-	//	{
-	//		"title":     "文章2",
-	//		"create_at": "2020-02-25",
-	//		"views":     342,
-	//		"tags":      "php",
-	//		"intro":     "yyyyyyyyyyyyyyyyy",
-	//	},
-	//}
 }

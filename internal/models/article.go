@@ -1,6 +1,8 @@
 package models
 
 import (
+	"errors"
+	"github.com/gomarkdown/markdown"
 	"gorm.io/gorm"
 	"time"
 )
@@ -12,6 +14,7 @@ type Article struct {
 	Keywords    string `gorm:"size:255;" json:"keywords,omitempty"`
 	Description string `gorm:"size:512;" json:"description,omitempty"`
 	Content     string `gorm:"type:text;" json:"content,omitempty"`
+	Html        string `gorm:"type:text;" json:"html,omitempty"`
 	Type        int    `gorm:"default:1;comment: 1 markdown 2 html" json:"type,omitempty"`
 	View        int    `gorm:"default:0;" json:"view,omitempty"`
 	Status      int    `gorm:"default:1;comment: 1 enable 0 disable" json:"status,omitempty"`
@@ -82,6 +85,7 @@ func ArticleAdd(data map[string]interface{}) (*Article, error) {
 	}
 	if article.Published == 1 {
 		article.PublishedAt = int(time.Now().Unix())
+		article.Html = string(markdown.ToHTML([]byte(article.Content), nil, nil))
 	}
 	db.Transaction(func(tx *gorm.DB) error {
 		// add article
@@ -118,8 +122,11 @@ func ArticleUpdate(id int, data map[string]interface{}) (*Article, error) {
 	if err != nil {
 		return nil, err
 	}
-	if data["published"].(int) == 1 && article.PublishedAt == 0 {
-		article.PublishedAt = int(time.Now().Unix())
+	if data["published"].(int) == 1 {
+		if article.PublishedAt == 0 {
+			article.PublishedAt = int(time.Now().Unix())
+		}
+		data["html"] = string(markdown.ToHTML([]byte(data["content"].(string)), nil, nil))
 	}
 	db.Transaction(func(tx *gorm.DB) error {
 		if err := db.Where("article_id = ?", id).Delete(&ArticleTag{}).Error; err != nil {
@@ -137,7 +144,8 @@ func ArticleUpdate(id int, data map[string]interface{}) (*Article, error) {
 }
 
 func ArticlePublish(id int, publish int) bool {
-	article, err := ArticleGetById(id)
+	var article Article
+	err := db.Select("id", "published", "published_at", "content").Where("id = ?", id).Find(&article).Error
 	if err != nil {
 		return false
 	}
@@ -145,10 +153,15 @@ func ArticlePublish(id int, publish int) bool {
 		return true
 	}
 	article.Published = publish
-	if article.PublishedAt == 0 {
-		article.PublishedAt = int(time.Now().Unix())
+	if article.Published == 1 {
+		if article.PublishedAt == 0 {
+			article.PublishedAt = int(time.Now().Unix())
+		}
+		article.Html = string(markdown.ToHTML([]byte(article.Content), nil, nil))
+	} else {
+		article.Html = ""
 	}
-	if db.Save(article).Error != nil {
+	if db.Select("published").Save(article).Error != nil {
 		return false
 	}
 	return true
@@ -196,4 +209,27 @@ func ArticleTagGetByArticleIds(ids []int) (map[int][]*Tag, error) {
 		result[artId] = append(result[artId], &tag)
 	}
 	return result, nil
+}
+
+func ArticleBuildHtml(art interface{}) (string, error) {
+	var article *Article
+	var content string
+	var err error
+	switch v := art.(type) {
+	case int:
+		article, err = ArticleGetById(v)
+		if err != nil {
+			return "", nil
+		}
+	case *Article:
+		article = v
+	default:
+		return "", errors.New("build html params error")
+	}
+	if article.Type == ArticleTypeMarkdown {
+		content = string(markdown.ToHTML([]byte(article.Content), nil, nil))
+	} else {
+		return article.Content, nil
+	}
+	return content, nil
 }

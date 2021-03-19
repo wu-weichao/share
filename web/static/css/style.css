@@ -71,14 +71,55 @@ html,body {
     background-color: #ffffff;
     flex: 1;
     border-radius: 5px;
+    min-width: 0;
 }
 .layout-container .layout-container-information {
     display: flex;
 }
-/*.layout-container .layout-container-content .article{*/
-/*    max-width: 900px;*/
-/*    margin: 0 auto;*/
-/*}*/
+/***** article list page css *****/
+.layout-container .layout-container-content .article-container{
+    padding: 10px 50px;
+}
+.article-container .article-item {
+    padding: 20px 20px 20px 0;
+    text-decoration: none;
+}
+.article-container .article-item:hover {
+    cursor: pointer;
+}
+.article-container .article-item-title {
+    font-size: 30px;
+    font-weight: 700;
+    color: #000000;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.article-container .article-item-info {
+    display: flex;
+    font-size: 14px;
+    color: #999AAA;
+    padding: 8px 0;
+}
+.article-container .article-item-info>div {
+    margin-right: 20px;
+    display: flex;
+    justify-content: center;
+}
+.article-container .article-item-info img {
+    width: 14px;
+    color: #999AAA;
+    margin-right: 8px;
+}
+.article-container .article-item-desc {
+    margin: 10px 0 30px;
+    color: #424242;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+}
+
 /***** exception page css *****/
 .layout-container .layout-container-exception {
     display: flex;
