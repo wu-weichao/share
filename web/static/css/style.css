@@ -2,6 +2,10 @@ html,body {
     margin: 0;
     padding: 0;
 }
+a {
+    text-decoration: none;
+    color: inherit;
+}
 .layout {
     background: #f0f2f5;
 }
@@ -95,11 +99,14 @@ html,body {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+.article-container .article-item:hover .article-item-title {
+    color: #13c2c2;
+}
 .article-container .article-item-info {
     display: flex;
     font-size: 14px;
     color: #999AAA;
-    padding: 8px 0;
+    padding: 8px 0 10px;
 }
 .article-container .article-item-info>div {
     margin-right: 20px;
@@ -112,12 +119,38 @@ html,body {
     margin-right: 8px;
 }
 .article-container .article-item-desc {
-    margin: 10px 0 30px;
+    margin: 0 0 20px;
     color: #424242;
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 3;
     overflow: hidden;
+}
+/***** article detail css *****/
+.layout-container .layout-container-content .article-detail{
+    padding: 10px 50px;
+}
+.article-detail .title {
+    font-size: 30px;
+    font-weight: 700;
+    color: #000000;
+}
+.article-detail .info {
+    display: flex;
+    font-size: 14px;
+    color: #999AAA;
+    padding: 15px 0;
+    margin-bottom: 20px;
+}
+.article-detail .info>div {
+    margin-right: 20px;
+    display: flex;
+    justify-content: center;
+}
+.article-detail .info img {
+    width: 14px;
+    color: #999AAA;
+    margin-right: 8px;
 }
 
 /***** exception page css *****/

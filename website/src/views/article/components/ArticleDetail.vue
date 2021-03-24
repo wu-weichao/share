@@ -168,6 +168,7 @@ export default {
     submitForm(published) {
       published = parseInt(published)
       // this.html = this.$refs.markdownEditor.getHtml()
+      console.log(this.$refs.markdownEditor.getHtml())
       this.$refs.postForm.validate(valid => {
         if (valid) {
           const tempData = Object.assign({}, this.postForm)
@@ -189,7 +190,7 @@ export default {
     },
     createData(data) {
       this.loading = true
-      createArticle(data).then(() => {
+      createArticle(data).then((response) => {
         this.loading = false
         this.$message({
           message: this.$t(data.published ? 'common.publishSuccess' : 'common.saveSuccess'),
@@ -200,9 +201,12 @@ export default {
         if (data.published) {
           this.$router.push('/article/list')
         } else {
-          // TODO 传参跳转至编辑页面
-
-          this.$router.push('/article/edit', {})
+          this.$router.push({
+            name: 'EditArticle',
+            params: {
+              id: response.data.id
+            }
+          })
         }
       }).catch(() => {
         this.loading = false

@@ -136,7 +136,7 @@ export const asyncRoutes = [
     name: 'Article',
     meta: {
       title: 'articleManagement',
-      icon: 'el-icon-s-help'
+      icon: 'el-icon-collection'
     },
     children: [
       {
@@ -168,7 +168,19 @@ export const asyncRoutes = [
         path: 'index',
         component: () => import('@/views/tag/index'),
         name: 'TagManagement',
-        meta: { title: 'tagManagement', icon: 'theme' }
+        meta: { title: 'tagManagement', icon: 'el-icon-collection-tag' }
+      }
+    ]
+  },
+  {
+    path: '/topic',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/topic/index'),
+        name: 'TopicManagement',
+        meta: { title: 'TopicManagement', icon: 'el-icon-position' }
       }
     ]
   },

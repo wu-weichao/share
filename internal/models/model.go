@@ -24,5 +24,5 @@ func init() {
 	}
 	// model init
 	// table migrate
-	db.AutoMigrate(&User{}, &Tag{}, &Article{}, &ArticleTag{})
+	db.AutoMigrate(&User{}, &Tag{}, &Article{}, &ArticleTag{}, &Topic{})
 }

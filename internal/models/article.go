@@ -17,7 +17,7 @@ type Article struct {
 	Html        string `gorm:"type:text;" json:"html,omitempty"`
 	Type        int    `gorm:"default:1;comment: 1 markdown 2 html" json:"type,omitempty"`
 	View        int    `gorm:"default:0;" json:"view,omitempty"`
-	Status      int    `gorm:"default:1;comment: 1 enable 0 disable" json:"status,omitempty"`
+	Status      int    `gorm:"default:1;comment: 1 enable -1 disable" json:"status,omitempty"`
 	Published   int    `gorm:"default:0;" json:"published,omitempty"`
 	PublishedAt int    `gorm:"" json:"published_at,omitempty"`
 }
@@ -87,7 +87,7 @@ func ArticleAdd(data map[string]interface{}) (*Article, error) {
 		article.PublishedAt = int(time.Now().Unix())
 		article.Html = string(markdown.ToHTML([]byte(article.Content), nil, nil))
 	}
-	db.Transaction(func(tx *gorm.DB) error {
+	err := db.Transaction(func(tx *gorm.DB) error {
 		// add article
 		if err := tx.Create(article).Error; err != nil {
 			return err
@@ -105,6 +105,9 @@ func ArticleAdd(data map[string]interface{}) (*Article, error) {
 		}
 		return nil
 	})
+	if err != nil {
+		return nil, err
+	}
 
 	return article, nil
 }
@@ -124,11 +127,11 @@ func ArticleUpdate(id int, data map[string]interface{}) (*Article, error) {
 	}
 	if data["published"].(int) == 1 {
 		if article.PublishedAt == 0 {
-			article.PublishedAt = int(time.Now().Unix())
+			data["published_at"] = int(time.Now().Unix())
 		}
 		data["html"] = string(markdown.ToHTML([]byte(data["content"].(string)), nil, nil))
 	}
-	db.Transaction(func(tx *gorm.DB) error {
+	err = db.Transaction(func(tx *gorm.DB) error {
 		if err := db.Where("article_id = ?", id).Delete(&ArticleTag{}).Error; err != nil {
 			return err
 		}
@@ -140,7 +143,28 @@ func ArticleUpdate(id int, data map[string]interface{}) (*Article, error) {
 		}
 		return nil
 	})
+	if err != nil {
+		return nil, err
+	}
 	return article, nil
+}
+
+func ArticleDelete(id int) error {
+	err := db.Transaction(func(tx *gorm.DB) error {
+		// delete article
+		if err := db.Delete(&Article{}, id).Error; err != nil {
+			return err
+		}
+		// delete article relation
+		//if err := db.Where("article_id = ?", id).Delete(&ArticleTag{}).Error; err != nil {
+		//	return err
+		//}
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func ArticlePublish(id int, publish int) bool {
@@ -161,10 +185,14 @@ func ArticlePublish(id int, publish int) bool {
 	} else {
 		article.Html = ""
 	}
-	if db.Select("published").Save(article).Error != nil {
+	if db.Select("published", "published_at", "html").Save(article).Error != nil {
 		return false
 	}
 	return true
+}
+
+func ArticleViewAdd(id int, v int) error {
+	return db.Model(&Article{}).Where("id", id).UpdateColumn("view", gorm.Expr("view + ?", v)).Error
 }
 
 func ArticleIdGetByTagIds(ids []int) ([]int, error) {
@@ -178,7 +206,7 @@ func ArticleIdGetByTagIds(ids []int) ([]int, error) {
 
 func ArticleTagGetByArticleId(id int) ([]*Tag, error) {
 	var tags []*Tag
-	err := db.Model(&ArticleTag{}).Select("tags.id, tags.name, tags.flag").Joins("left join tags on article_tags.tag_id = tags.id").Where("article_tags.article_id = ?", id).Find(&tags).Error
+	err := db.Model(&ArticleTag{}).Select("tags.id, tags.name, tags.flag").Joins("left join tags on article_tags.tag_id = tags.id").Where("article_tags.article_id = ?", id).Where("tags.id IS NOT NULL").Find(&tags).Error
 	if err != nil {
 		return nil, err
 	}
@@ -186,7 +214,7 @@ func ArticleTagGetByArticleId(id int) ([]*Tag, error) {
 }
 
 func ArticleTagGetByArticleIds(ids []int) (map[int][]*Tag, error) {
-	rows, err := db.Model(&ArticleTag{}).Select("article_tags.article_id, tags.id, tags.name, tags.flag").Joins("left join tags on article_tags.tag_id = tags.id").Where("article_tags.article_id IN ?", ids).Rows()
+	rows, err := db.Model(&ArticleTag{}).Select("article_tags.article_id, tags.id, tags.name, tags.flag").Joins("left join tags on article_tags.tag_id = tags.id").Where("article_tags.article_id IN ?", ids).Where("tags.id IS NOT NULL").Rows()
 	if err != nil {
 		return nil, err
 	}

@@ -67,6 +67,7 @@ func GetTags(c *gin.Context) {
 
 func GetSimpleTags(c *gin.Context) {
 	maps := make(map[string]interface{})
+	maps["status"] = 1
 	flag := c.Query("flag")
 	if flag != "" {
 		maps["flag LIKE ?"] = flag + "%"
@@ -182,5 +183,16 @@ func UpdateTag(c *gin.Context) {
 		return
 	}
 
+	api.Success(c, "")
+}
+
+func DeleteTag(c *gin.Context) {
+	id := c.Param("id")
+	tagId, _ := strconv.Atoi(id)
+	err := models.TagDelete(tagId)
+	if err != nil {
+		api.ErrorRequest(c, "Tag delete failed")
+		return
+	}
 	api.Success(c, "")
 }

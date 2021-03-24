@@ -11,6 +11,7 @@ import (
 	v1 "share/internal/app/service/api/v1"
 	"share/internal/app/service/web"
 	"share/pkg/html/funcs"
+	"strings"
 )
 
 func InitRouter() *gin.Engine {
@@ -47,15 +48,21 @@ func InitRouter() *gin.Engine {
 			apiv1WithAuth.GET("/tags/:id", v1.GetTag)
 			apiv1WithAuth.POST("/tags", v1.StoreTag)
 			apiv1WithAuth.PUT("/tags/:id", v1.UpdateTag)
-			apiv1WithAuth.DELETE("/tags/:id")
+			apiv1WithAuth.DELETE("/tags/:id", v1.DeleteTag)
 
 			apiv1WithAuth.GET("/articles", v1.GetArticles)
 			apiv1WithAuth.GET("/articles/:id", v1.GetArticle)
 			apiv1WithAuth.POST("/articles", v1.StoreArticle)
 			apiv1WithAuth.PUT("/articles/:id", v1.UpdateArticle)
-			apiv1WithAuth.DELETE("/articles/:id")
+			apiv1WithAuth.DELETE("/articles/:id", v1.DeleteArticle)
 			apiv1WithAuth.PUT("/articles/:id/publish", v1.PublishArticle)
 			apiv1WithAuth.PUT("/articles/:id/unpublish", v1.UnpublishArticle)
+
+			apiv1WithAuth.GET("/topics", v1.GetTopics)
+			apiv1WithAuth.GET("/topics/:id", v1.GetTopic)
+			apiv1WithAuth.POST("/topics", v1.StoreTopic)
+			apiv1WithAuth.PUT("/topics/:id", v1.UpdateTopic)
+			apiv1WithAuth.DELETE("/topics/:id", v1.DeleteTopic)
 		}
 	}
 	// frontend group
@@ -63,6 +70,9 @@ func InitRouter() *gin.Engine {
 	{
 		front.GET("/", web.Homepage)
 		front.GET("/page/:num", web.Homepage)
+		front.GET("/article/:id", web.ShowArticle)
+		front.GET("/topic/:flag", web.Topic)
+		front.GET("/topic/:flag/page/:num", web.Topic)
 	}
 
 	return r
@@ -76,6 +86,7 @@ func loadTemplates(templatesDir string) multitemplate.Renderer {
 		"unixToDate":     funcs.UnixToDate,
 		"unixToFormat":   funcs.UnixToFormat,
 		"implode":        funcs.Implode,
+		"html":           funcs.Html,
 	}
 
 	layouts, err := filepath.Glob(templatesDir + "/layouts/*.tmpl")
@@ -93,7 +104,7 @@ func loadTemplates(templatesDir string) multitemplate.Renderer {
 		layoutCopy := make([]string, len(layouts))
 		copy(layoutCopy, layouts)
 		files := append(layoutCopy, view)
-		r.AddFromFilesFuncs(filepath.Base(view), funcMap, files...)
+		r.AddFromFilesFuncs(strings.TrimSuffix(filepath.Base(view), filepath.Ext(view)), funcMap, files...)
 	}
 	return r
 }

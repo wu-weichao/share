@@ -1,5 +1,9 @@
 package models
 
+import (
+	"gorm.io/gorm"
+)
+
 type Tag struct {
 	Model
 
@@ -98,4 +102,22 @@ func TagUpdate(id int, data map[string]interface{}) (*Tag, error) {
 		return nil, err
 	}
 	return tag, nil
+}
+
+func TagDelete(id int) error {
+	err := db.Transaction(func(tx *gorm.DB) error {
+		// delete tag
+		if err := db.Delete(&Tag{}, id).Error; err != nil {
+			return err
+		}
+		// delete tag relation
+		//if err := db.Where("tag_id = ?", id).Delete(&ArticleTag{}).Error; err != nil {
+		//	return err
+		//}
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+	return nil
 }

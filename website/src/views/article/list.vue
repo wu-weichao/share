@@ -67,7 +67,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column align="center" :label="$t('table.actions')" width="180">
+      <el-table-column align="center" :label="$t('table.actions')" width="240">
         <template slot-scope="scope">
           <router-link :to="'/article/edit/'+scope.row.id">
             <el-button type="primary" size="small">
@@ -81,6 +81,10 @@
           <el-popconfirm v-else placement="top" title="确定发布文章吗？" @onConfirm="articlePublishHandle(scope.row)">
             <el-button slot="reference" type="success" size="small" style="margin-left: 10px;">{{ $t('table.publish') }}</el-button>
           </el-popconfirm>
+
+          <el-popconfirm placement="top" title="确定删除该文章吗？" @onConfirm="handleDelete(scope.row)">
+            <el-button slot="reference" type="danger" size="small" style="margin-left: 10px;">{{ $t('table.delete') }}</el-button>
+          </el-popconfirm>
         </template>
       </el-table-column>
     </el-table>
@@ -90,7 +94,7 @@
 </template>
 
 <script>
-import { fetchList, publishArticle, unpublishArticle } from '@/api/article'
+import { fetchList, publishArticle, unpublishArticle, deleteArticle } from '@/api/article'
 import { fetchSelectList } from '@/api/tag'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
 import waves from '@/directive/waves' // waves directive
@@ -181,6 +185,17 @@ export default {
           })
         })
       }
+    },
+    handleDelete(row) {
+      deleteArticle(row.id).then(() => {
+        this.getList()
+        this.$notify({
+          title: this.$t('common.success'),
+          message: this.$t('common.deleteSuccess'),
+          type: 'success',
+          duration: 2000
+        })
+      })
     }
   }
 }

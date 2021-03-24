@@ -301,7 +301,14 @@ func UpdateArticle(c *gin.Context) {
 }
 
 func DeleteArticle(c *gin.Context) {
-
+	id := c.Param("id")
+	artId, _ := strconv.Atoi(id)
+	err := models.ArticleDelete(artId)
+	if err != nil {
+		api.ErrorRequest(c, "Article delete failed")
+		return
+	}
+	api.Success(c, "")
 }
 
 func PublishArticle(c *gin.Context) {

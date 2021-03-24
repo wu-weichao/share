@@ -38,3 +38,10 @@ export function updateTag(id, data) {
     data
   })
 }
+
+export function deleteTag(id) {
+  return request({
+    url: '/tags/' + id,
+    method: 'delete'
+  })
+}

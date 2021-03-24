@@ -1,0 +1,17 @@
+{{ define "content" }}
+<link rel="stylesheet" href="/static/css/github-markdown.min.css">
+<div class="layout-container-content">
+    <div class="article-detail">
+        <div class="title">{{ .article.Title }}</div>
+        <div class="info">
+            <div><img src="/static/images/date.svg">{{ unixToFormat .article.PublishedAt "2006-01-02 15:04" }}</div>
+            <div><img src="/static/images/eye.svg">{{ .article.View }}</div>
+            <div><img src="/static/images/tag.svg">{{ implode .article.Tags "、" }}</div>
+        </div>
+        <div class="markdown-body">
+            {{ .article.Html | html}}
+        </div>
+    </div>
+</div>
+
+{{ end }}

@@ -2,15 +2,14 @@
 
 <div class="layout-header">
     <div class="header-box">
-        <div class="logo">
+        <a class="logo" href="/">
             <img src="/static/images/logo.png" alt="">
             <h1>Share</h1>
-        </div>
+        </a>
         <div class="topic">
-            <div>category1</div>
-            <div>category2</div>
-            <div>category3</div>
-            <div>category4</div>
+            {{ range .topics }}
+                <div><a href="{{ .Url }}">{{ .Title }}</a></div>
+            {{ end }}
         </div>
         <!--<div class="avatar"></div>-->
     </div>

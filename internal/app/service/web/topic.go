@@ -6,18 +6,7 @@ import (
 	"strconv"
 )
 
-type ArticleListItem struct {
-	ID          uint   `json:"id"`
-	Title       string `json:"title"`
-	Cover       string `json:"cover"`
-	Description string `json:"description"`
-	View        int    `json:"view"`
-	PublishedAt int    `json:"published_at"`
-
-	Tags []string
-}
-
-func Homepage(c *gin.Context) {
+func Topic(c *gin.Context) {
 	var page int
 	var pageSize int = 10
 	if num := c.Param("num"); num != "" {
@@ -26,14 +15,30 @@ func Homepage(c *gin.Context) {
 	if page <= 0 {
 		page = 1
 	}
+	flag := c.Param("flag")
+	var err error
+	tag, err := models.TagGetByFlag(flag)
+	if err != nil {
+		View404(c)
+		return
+	}
+	articleIds, err := models.ArticleIdGetByTagIds([]int{int(tag.ID)})
+	if err != nil {
+		View404(c)
+		return
+	}
+	if articleIds == nil { // empty articles
+		Homepage(c)
+		return
+	}
 	// get articles
 	maps := map[string]interface{}{
 		"published = ?": 1,
+		"id IN ?":       articleIds,
 	}
 	var total int
 	var articles []*models.Article
 	var articleList []*ArticleListItem
-	var err error
 	if total, err = models.ArticleGetTotal(maps); err != nil {
 		View500(c)
 		return

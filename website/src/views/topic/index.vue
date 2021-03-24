@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input v-model="listQuery.flag" clearable :placeholder="'标识'" style="width: 200px;margin-right: 10px;" class="filter-item" @keyup.enter.native="handleFilter" />
+      <el-input v-model="listQuery.title" clearable :placeholder="'名称'" style="width: 200px;margin-right: 10px;" class="filter-item" @keyup.enter.native="handleFilter" />
       <el-button v-waves class="filter-item" icon="el-icon-search" @click="handleFilter">
         {{ $t('table.search') }}
       </el-button>
@@ -19,24 +19,24 @@
       highlight-current-row
       style="width: 100%;"
     >
-      <el-table-column :label="$t('tag.flag')" prop="flag" align="center" width="100">
+      <el-table-column :label="$t('topic.title')" prop="title" align="center" width="150">
         <template slot-scope="{row}">
-          <span>{{ row.flag }}</span>
+          <span>{{ row.title }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('tag.name')" prop="name" align="center" width="150">
+      <el-table-column :label="$t('topic.url')" prop="url" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.name }}</span>
+          <div style="text-align: left;">{{ row.url }}</div>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('tag.description')" prop="description" align="center">
-        <template slot-scope="{row}">
-          <span>{{ row.description }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column :label="$t('table.date')" align="center" width="150">
+      <el-table-column :label="$t('table.date')" align="center" width="180">
         <template slot-scope="{row}">
           <span>{{ row.created_at | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column :label="$t('topic.sort')" prop="sort" align="center" width="100">
+        <template slot-scope="{row}">
+          <span>{{ row.sort }}</span>
         </template>
       </el-table-column>
       <el-table-column :label="$t('table.status')" class-name="status-col" width="100">
@@ -51,7 +51,7 @@
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
             {{ $t('table.edit') }}
           </el-button>
-          <el-popconfirm placement="top" title="确定删除该分类吗？" @onConfirm="handleDelete(row)">
+          <el-popconfirm placement="top" title="确定删除该主题吗？" @onConfirm="handleDelete(row)">
             <el-button slot="reference" type="danger" size="small" style="margin-left: 10px;">{{ $t('table.delete') }}</el-button>
           </el-popconfirm>
         </template>
@@ -62,14 +62,14 @@
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="padding: 0 20px;">
-        <el-form-item :label="$t('tag.name')" prop="name">
-          <el-input v-model="temp.name" />
+        <el-form-item :label="$t('topic.title')" prop="title">
+          <el-input v-model="temp.title" />
         </el-form-item>
-        <el-form-item :label="$t('tag.flag')" prop="flag">
-          <el-input v-model="temp.flag" />
+        <el-form-item :label="$t('topic.url')" prop="url">
+          <el-input v-model="temp.url" />
         </el-form-item>
-        <el-form-item :label="$t('tag.description')">
-          <el-input v-model="temp.description" :autosize="{ minRows: 2, maxRows: 4}" type="textarea" placeholder="Please input" />
+        <el-form-item :label="$t('topic.sort')">
+          <el-input-number v-model="temp.sort" />
         </el-form-item>
         <el-form-item :label="$t('table.status')" prop="status">
           <el-radio v-model="temp.status" :label="1">{{ $t('common.enabled') }}</el-radio>
@@ -89,13 +89,13 @@
 </template>
 
 <script>
-import { fetchList, createTag, updateTag, deleteTag } from '@/api/tag'
+import { fetchList, createTopic, updateTopic, deleteTopic } from '@/api/topic'
 import waves from '@/directive/waves' // waves directive
 // import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
 export default {
-  name: 'Tag',
+  name: 'Topic',
   components: { Pagination },
   directives: { waves },
   filters: {},
@@ -108,13 +108,13 @@ export default {
       listQuery: {
         page: 1,
         page_size: 10,
-        flag: ''
+        title: ''
       },
       temp: {
         id: undefined,
-        name: '',
-        flag: '',
-        description: '',
+        title: '',
+        url: '',
+        sort: 0,
         status: 1
       },
       dialogFormVisible: false,
@@ -124,8 +124,8 @@ export default {
         create: this.$t('table.add')
       },
       rules: {
-        name: [{ required: true, message: 'name is required', trigger: 'blur' }],
-        flag: [{ required: true, message: 'flag is required', trigger: 'blur' }],
+        title: [{ required: true, message: 'title is required', trigger: 'blur' }],
+        url: [{ required: true, message: 'url is required', trigger: 'blur' }],
         status: [{ required: true, message: 'status is required', trigger: 'change' }]
       }
     }
@@ -151,9 +151,9 @@ export default {
     resetTemp() {
       this.temp = {
         id: undefined,
-        name: '',
-        flag: '',
-        description: '',
+        title: '',
+        url: '',
+        sort: 0,
         status: 1
       }
     },
@@ -168,7 +168,7 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          createTag(this.temp).then(() => {
+          createTopic(this.temp).then(() => {
             this.dialogFormVisible = false
             this.getList()
             this.$notify({
@@ -193,7 +193,7 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
-          updateTag(tempData.id, tempData).then(() => {
+          updateTopic(tempData.id, tempData).then(() => {
             this.getList()
             this.dialogFormVisible = false
             this.$notify({
@@ -207,7 +207,7 @@ export default {
       })
     },
     handleDelete(row) {
-      deleteTag(row.id).then(() => {
+      deleteTopic(row.id).then(() => {
         this.getList()
         this.$notify({
           title: this.$t('common.success'),

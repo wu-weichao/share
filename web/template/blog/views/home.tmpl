@@ -3,16 +3,17 @@
 <div class="layout-container-content">
     <div class="article-container">
         {{ range .articles}}
-        <a class="article-item" href="" target="_self">
-            <div class="article-item-title">{{ .Title }}</div>
-            <div class="article-item-info">
-                <div><img src="/static/images/date.svg">{{ unixToFormat .PublishedAt "2006-01-02 15:04" }}</div>
-                <div><img src="/static/images/eye.svg">{{ .View }}</div>
-                <div><img src="/static/images/tag.svg"> {{ implode .Tags "、" }}
+        <div class="article-item" >
+            <a href="/blog/article/{{ .ID }}" target="_self">
+                <div class="article-item-title">{{ .Title }}</div>
+                <div class="article-item-info">
+                    <div><img src="/static/images/date.svg">{{ unixToFormat .PublishedAt "2006-01-02 15:04" }}</div>
+                    <div><img src="/static/images/eye.svg">{{ .View }}</div>
+                    <div><img src="/static/images/tag.svg">{{ implode .Tags "、" }}</div>
                 </div>
-            </div>
-            <div class="article-item-desc">{{ .Description }}</div>
-        </a>
+                <div class="article-item-desc">{{ .Description }}</div>
+            </a>
+        </div>
         {{ end }}
     </div>
 
