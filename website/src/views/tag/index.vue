@@ -9,7 +9,6 @@
         {{ $t('table.add') }}
       </el-button>
     </div>
-
     <el-table
       :key="tableKey"
       v-loading="listLoading"

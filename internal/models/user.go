@@ -3,6 +3,7 @@ package models
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"log"
 )
 
 type User struct {
@@ -44,4 +45,22 @@ func UserEncodePassword(password string) string {
 	h := sha256.New()
 	h.Write([]byte(password))
 	return string(hex.EncodeToString(h.Sum(nil)))
+}
+
+func CreateAdmin() bool {
+	var admin User
+	result := db.Where("type = ?", -1).First(&admin)
+	if result.Error != nil {
+		admin.Name = "admin"
+		admin.Email = "admin@gmail.com"
+		admin.Password = UserEncodePassword("123456")
+		admin.Type = -1
+		admin.Status = 1
+		result := db.Create(&admin)
+		if result.Error != nil {
+			log.Fatalf("create admin err: %v", result.Error)
+			return false
+		}
+	}
+	return true
 }

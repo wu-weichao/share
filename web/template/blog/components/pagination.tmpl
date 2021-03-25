@@ -1,0 +1,40 @@
+{{ define "pagination" }}
+    <link rel="stylesheet" href="/static/css/pagination.css">
+    <div class="pagination-container">
+        <div class="pagination">
+            <span class="pagination__total">共 {{ .pagination.Total }} 条</span>
+            <a {{ if gt .pagination.Prev 1}} href="{{ .pagination.Link }}{{ .pagination.Prev }}" {{ end }}>
+                <button type="button" class="btn-prev">
+                    <svg t="1616641218096" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5110" width="16" height="16"><path d="M332.8 512l406.4 406.4c12.8 12.8 12.8 32 0 44.8-12.8 12.8-32 12.8-44.8 0L265.6 534.4c-6.4-6.4-9.6-12.8-9.6-22.4s3.2-16 9.6-22.4L694.4 60.8c12.8-12.8 32-12.8 44.8 0 12.8 12.8 12.8 32 0 44.8L332.8 512z" p-id="5111"></path></svg>
+                </button>
+            </a>
+            <ul class="pager">
+                {{ range $k, $v := .pagination.PageNums}}
+                    {{ if eq $v 0}}
+                        <li class="number">...</li>
+                    {{ else if eq $v $.pagination.Page }}
+                        <li class="active number">{{ $v }}</li>
+                    {{ else }}
+                        <a href="{{ $.pagination.Link }}{{ $v }}">
+                            <li class="number">
+                                {{ $v }}
+                            </li>
+                        </a>
+                    {{ end }}
+                {{ end }}
+            </ul>
+            <a {{ if gt .pagination.Next 1}} href="{{ .pagination.Link }}{{ .pagination.Next }}" {{ end }}>
+                <button type="button" class="btn-next">
+                    <svg t="1616641240413" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5254" width="16" height="16"><path d="M265.6 105.6c-12.8-12.8-12.8-32 0-44.8 12.8-12.8 32-12.8 44.8 0l428.8 428.8c6.4 6.4 9.6 16 9.6 22.4s-3.2 16-9.6 22.4L310.4 963.2c-12.8 12.8-32 12.8-44.8 0-12.8-12.8-12.8-32 0-44.8L672 512 265.6 105.6z" p-id="5255"></path></svg>
+                </button>
+            </a>
+{{/*            <span class="pagination__jump">前往*/}}
+{{/*                <div class="input input--medium pagination__editor is-in-pagination">*/}}
+{{/*                    <input type="number" autocomplete="off" min="1" max="5" class="input__inner">*/}}
+{{/*                </div>页*/}}
+{{/*            </span>*/}}
+        </div>
+    </div>
+
+{{ end }}
+

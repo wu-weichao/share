@@ -73,8 +73,11 @@ func Homepage(c *gin.Context) {
 	}
 	View(c, "home", gin.H{
 		"articles": articleList,
-		"total":    total,
-		"page":     page,
-		"pageSize": pageSize,
+		"pagination": formatPagination(&Pagination{
+			Page:     page,
+			PageSize: pageSize,
+			Total:    total,
+			Link:     c.FullPath(),
+		}),
 	})
 }

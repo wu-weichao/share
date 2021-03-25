@@ -185,6 +185,12 @@ a {
     line-height: 28px;
     margin-bottom: 16px;
 }
+.empty-data {
+    color: rgba(0,0,0,.45);
+    text-align: center;
+    padding: 100px 0;
+}
+
 @media screen and (max-width: 800px) {
     .layout-header .logo h1{
         display: none;

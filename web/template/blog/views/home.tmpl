@@ -14,14 +14,16 @@
                 <div class="article-item-desc">{{ .Description }}</div>
             </a>
         </div>
+        {{ else }}
+            {{ template "empty" }}
         {{ end }}
     </div>
-
+    {{ template "pagination" . }}
 
     {{/*            <div>{{ .Tags }}</div>*/}}
-    {{ .total }}
-    {{ .page }}
-    {{ .pageSize }}
+{{/*    {{ .total }}*/}}
+{{/*    {{ .page }}*/}}
+{{/*    {{ .pageSize }}*/}}
 </div>
 
 {{ end }}

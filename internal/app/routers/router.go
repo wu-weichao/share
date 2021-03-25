@@ -28,7 +28,9 @@ func InitRouter() *gin.Engine {
 	r.StaticFS("/static", http.Dir("../../web/static"))
 
 	// router
-	r.GET("/", web.Homepage)
+	r.GET("/", func(c *gin.Context) {
+		c.Redirect(http.StatusMovedPermanently, "/blog")
+	})
 
 	// route group
 	// api group
@@ -94,6 +96,11 @@ func loadTemplates(templatesDir string) multitemplate.Renderer {
 		panic(fmt.Sprintf("load template.layouts err: %v\n", err))
 	}
 
+	components, err := filepath.Glob(templatesDir + "/components/*.tmpl")
+	if err != nil {
+		panic(fmt.Sprintf("load template.components err: %v\n", err))
+	}
+
 	views, err := filepath.Glob(templatesDir + "/views/*.tmpl")
 	if err != nil {
 		panic(fmt.Sprintf("load template.views err: %v\n", err))
@@ -103,6 +110,10 @@ func loadTemplates(templatesDir string) multitemplate.Renderer {
 	for _, view := range views {
 		layoutCopy := make([]string, len(layouts))
 		copy(layoutCopy, layouts)
+		// append components
+		for _, component := range components {
+			layoutCopy = append(layoutCopy, component)
+		}
 		files := append(layoutCopy, view)
 		r.AddFromFilesFuncs(strings.TrimSuffix(filepath.Base(view), filepath.Ext(view)), funcMap, files...)
 	}
