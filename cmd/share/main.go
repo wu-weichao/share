@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"share/configs"
 	"share/internal/app/routers"
+	_ "share/internal/database"
 	_ "share/internal/models"
 )
 

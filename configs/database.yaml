@@ -7,3 +7,8 @@ database:
   dbname: share
   table_prefix:
   charset: utf8mb4
+redis:
+  host: 127.0.0.1
+  port: 6379
+  password: 1234561
+  database: 0

@@ -261,3 +261,11 @@ func ArticleBuildHtml(art interface{}) (string, error) {
 	}
 	return content, nil
 }
+
+func ArticleViewCount() (int, error) {
+	var total int
+	if err := db.Model(&Article{}).Pluck("sum(view) as total", &total).Error; err != nil {
+		return 0, err
+	}
+	return total, nil
+}

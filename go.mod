@@ -8,6 +8,7 @@ require (
 	github.com/gin-contrib/multitemplate v0.0.0-20200916052041-666a7309d230
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-playground/validator/v10 v10.4.1
+	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/golang/protobuf v1.4.3 // indirect
 	github.com/gomarkdown/markdown v0.0.0-20210208175418-bda154fe17d8
 	github.com/jackc/pgproto3/v2 v2.0.7 // indirect

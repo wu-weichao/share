@@ -2,67 +2,106 @@
   <el-row :gutter="40" class="panel-group">
     <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
       <div class="card-panel" @click="handleSetLineChartData('newVisitis')">
-        <div class="card-panel-icon-wrapper icon-people">
-          <svg-icon icon-class="peoples" class-name="card-panel-icon" />
+        <div class="card-panel-icon-wrapper icon-user">
+          <svg-icon icon-class="user" class-name="card-panel-icon" />
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">
             New Visits
           </div>
-          <count-to :start-val="0" :end-val="102400" :duration="2600" class="card-panel-num" />
+          <count-to :start-val="0" :end-val="newVisitCount" :duration="2600" class="card-panel-num" />
         </div>
       </div>
     </el-col>
+
     <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
-      <div class="card-panel" @click="handleSetLineChartData('messages')">
-        <div class="card-panel-icon-wrapper icon-message">
-          <svg-icon icon-class="message" class-name="card-panel-icon" />
+      <div class="card-panel" @click="handleSetLineChartData('visitis')">
+        <div class="card-panel-icon-wrapper icon-people">
+          <svg-icon icon-class="peoples" class-name="card-panel-icon" />
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">
-            Messages
+            Visits
           </div>
-          <count-to :start-val="0" :end-val="81212" :duration="3000" class="card-panel-num" />
+          <count-to :start-val="0" :end-val="visitCount" :duration="2600" class="card-panel-num" />
         </div>
       </div>
     </el-col>
+
     <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
-      <div class="card-panel" @click="handleSetLineChartData('purchases')">
-        <div class="card-panel-icon-wrapper icon-money">
-          <svg-icon icon-class="money" class-name="card-panel-icon" />
+      <div class="card-panel" @click="handleSetLineChartData('views')">
+        <div class="card-panel-icon-wrapper icon-view">
+          <svg-icon icon-class="eye-open" class-name="card-panel-icon" />
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">
-            Purchases
+            Views
           </div>
-          <count-to :start-val="0" :end-val="9280" :duration="3200" class="card-panel-num" />
+          <count-to :start-val="0" :end-val="viewCount" :duration="3200" class="card-panel-num" />
         </div>
       </div>
     </el-col>
+
     <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
-      <div class="card-panel" @click="handleSetLineChartData('shoppings')">
-        <div class="card-panel-icon-wrapper icon-shopping">
-          <svg-icon icon-class="shopping" class-name="card-panel-icon" />
+      <div class="card-panel" @click="handleSetLineChartData('articlies')">
+        <div class="card-panel-icon-wrapper icon-article">
+          <svg-icon icon-class="education" class-name="card-panel-icon" />
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">
-            Shoppings
+            Articles
           </div>
-          <count-to :start-val="0" :end-val="13600" :duration="3600" class="card-panel-num" />
+          <count-to :start-val="0" :end-val="articlyCount" :duration="3000" class="card-panel-num" />
         </div>
       </div>
     </el-col>
+
   </el-row>
 </template>
 
 <script>
 import CountTo from 'vue-count-to'
+import { getNewVisitCount, getVisitCount, getViewCount, getArticlyCount } from '@/api/statistics'
 
 export default {
   components: {
     CountTo
   },
+  data() {
+    return {
+      newVisitCount: 0,
+      visitCount: 0,
+      viewCount: 0,
+      articlyCount: 0
+    }
+  },
+  created() {
+    this.setNewVisitCount()
+    this.setVisitCount()
+    this.setViewCount()
+    this.setArticlyCount()
+  },
   methods: {
+    setNewVisitCount() {
+      getNewVisitCount().then(response => {
+        this.newVisitCount = response.data || 0
+      })
+    },
+    setVisitCount() {
+      getVisitCount().then(response => {
+        this.visitCount = response.data || 0
+      })
+    },
+    setViewCount() {
+      getViewCount().then(response => {
+        this.viewCount = response.data || 0
+      })
+    },
+    setArticlyCount() {
+      getArticlyCount().then(response => {
+        this.articlyCount = response.data || 0
+      })
+    },
     handleSetLineChartData(type) {
       this.$emit('handleSetLineChartData', type)
     }
@@ -98,15 +137,15 @@ export default {
         background: #40c9c6;
       }
 
-      .icon-message {
+      .icon-user {
         background: #36a3f7;
       }
 
-      .icon-money {
-        background: #f4516c;
+      .icon-view {
+        background: #3f51b5;
       }
 
-      .icon-shopping {
+      .icon-article {
         background: #34bfa3
       }
     }
@@ -115,15 +154,15 @@ export default {
       color: #40c9c6;
     }
 
-    .icon-message {
+    .icon-user {
       color: #36a3f7;
     }
 
-    .icon-money {
-      color: #f4516c;
+    .icon-view {
+      color: #3f51b5;
     }
 
-    .icon-shopping {
+    .icon-article {
       color: #34bfa3
     }
 

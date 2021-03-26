@@ -27,6 +27,15 @@ type DatabaseConfig struct {
 
 var Database = &DatabaseConfig{}
 
+type RedisConfig struct {
+	Host     string `mapstructure:"host"`
+	Port     int    `mapstructure:"port"`
+	Password string `mapstructure:"password"`
+	Database int    `mapstructure:"database"`
+}
+
+var Redis = &RedisConfig{}
+
 type JwtConfig struct {
 	Secret string `mapstructure:"secret"`
 	Ttl    int    `mapstructure:"ttl"`
@@ -65,5 +74,6 @@ func init() {
 			panic(fmt.Sprintf("load database.yaml err: %v\n", err))
 		}
 		viper.UnmarshalKey("database", Database)
+		viper.UnmarshalKey("redis", Redis)
 	})
 }

@@ -65,6 +65,11 @@ func InitRouter() *gin.Engine {
 			apiv1WithAuth.POST("/topics", v1.StoreTopic)
 			apiv1WithAuth.PUT("/topics/:id", v1.UpdateTopic)
 			apiv1WithAuth.DELETE("/topics/:id", v1.DeleteTopic)
+
+			apiv1WithAuth.GET("/statistics/new_visit_count", v1.GetNewVisitCount)
+			apiv1WithAuth.GET("/statistics/visit_count", v1.GetVisitCount)
+			apiv1WithAuth.GET("/statistics/view_count", v1.GetViewCount)
+			apiv1WithAuth.GET("/statistics/articly_count", v1.GetArticlyCount)
 		}
 	}
 	// frontend group
