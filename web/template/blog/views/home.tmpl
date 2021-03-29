@@ -1,6 +1,6 @@
 {{ define "content" }}
 
-<div class="layout-container-content">
+<div class="layout-container-content flex-column-space-between">
     <div class="article-container">
         {{ range .articles}}
         <div class="article-item" >
@@ -19,11 +19,6 @@
         {{ end }}
     </div>
     {{ template "pagination" . }}
-
-    {{/*            <div>{{ .Tags }}</div>*/}}
-{{/*    {{ .total }}*/}}
-{{/*    {{ .page }}*/}}
-{{/*    {{ .pageSize }}*/}}
 </div>
 
 {{ end }}

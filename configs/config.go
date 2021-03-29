@@ -8,6 +8,7 @@ import (
 
 type AppConfig struct {
 	RunMode      string `mapstructure:"run_mode"`
+	HttpPort     int    `mapstructure:"http_port"`
 	AppPath      string `mapstructure:"app_path"`
 	TemplatePath string `mapstructure:"template_path"`
 }

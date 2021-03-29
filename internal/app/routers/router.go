@@ -19,9 +19,7 @@ func InitRouter() *gin.Engine {
 	r := gin.New()
 
 	// middleware
-
 	r.Use(middleware.Cors())
-	r.Use(middleware.Log())
 
 	// templates
 	r.HTMLRender = loadTemplates("../../web/template/blog")
@@ -37,6 +35,7 @@ func InitRouter() *gin.Engine {
 	// route group
 	// api group
 	apiv1 := r.Group("/api/v1")
+	apiv1.Use(middleware.Log())
 	{
 		apiv1.POST("/login", v1.Login)
 		apiv1.POST("/logout", v1.Logout)
@@ -80,6 +79,7 @@ func InitRouter() *gin.Engine {
 	// frontend group
 	front := r.Group("/blog")
 	// middleware
+	front.Use(middleware.Log())
 	front.Use(middleware.Statistics())
 	{
 		front.GET("/", web.Homepage)

@@ -1,5 +1,7 @@
 app:
+  # debug release test
   run_mode: debug
+  http_port: 80
   app_path:
   template_path: web/template
 jwt:

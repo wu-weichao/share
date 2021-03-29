@@ -1,8 +1,9 @@
 package main
 
-//import "github.com/gin-gonic/gin"
 import (
 	"fmt"
+	"github.com/gin-gonic/gin"
+	"log"
 	"share/configs"
 	"share/internal/app/routers"
 	_ "share/internal/database"
@@ -11,8 +12,12 @@ import (
 )
 
 func main() {
+	// set gin mode
+	gin.SetMode(configs.App.RunMode)
+	// init router
 	r := routers.InitRouter()
-	fmt.Printf("configs.App: %+v\n", configs.App)
-	fmt.Printf("configs.Database: %+v\n", configs.Database)
-	r.Run()
+	// run http server
+	addr := fmt.Sprintf(":%d", configs.App.HttpPort)
+	r.Run(addr)
+	log.Printf("[info] start http server listening %s", addr)
 }

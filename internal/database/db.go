@@ -10,8 +10,9 @@ import (
 )
 
 func GetDB(c *configs.DatabaseConfig) (db *gorm.DB, err error) {
-	cfg := &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Info),
+	cfg := &gorm.Config{}
+	if configs.App.RunMode == "debug" {
+		cfg.Logger = logger.Default.LogMode(logger.Info)
 	}
 	switch c.Type {
 	case "mysql":

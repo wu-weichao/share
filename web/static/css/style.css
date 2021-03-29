@@ -185,6 +185,11 @@ a {
     line-height: 28px;
     margin-bottom: 16px;
 }
+.flex-column-space-between {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
 .empty-data {
     color: rgba(0,0,0,.45);
     text-align: center;
