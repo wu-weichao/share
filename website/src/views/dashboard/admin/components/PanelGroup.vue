@@ -1,7 +1,7 @@
 <template>
   <el-row :gutter="40" class="panel-group">
     <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
-      <div class="card-panel" @click="handleSetLineChartData('newVisitis')">
+      <div class="card-panel">
         <div class="card-panel-icon-wrapper icon-user">
           <svg-icon icon-class="user" class-name="card-panel-icon" />
         </div>
@@ -9,13 +9,13 @@
           <div class="card-panel-text">
             New Visits
           </div>
-          <count-to :start-val="0" :end-val="newVisitCount" :duration="2600" class="card-panel-num" />
+          <count-to :start-val="0" :end-val="newVisitCount" :duration="getDuration(newVisitCount)" class="card-panel-num" />
         </div>
       </div>
     </el-col>
 
     <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
-      <div class="card-panel" @click="handleSetLineChartData('visitis')">
+      <div class="card-panel">
         <div class="card-panel-icon-wrapper icon-people">
           <svg-icon icon-class="peoples" class-name="card-panel-icon" />
         </div>
@@ -23,13 +23,13 @@
           <div class="card-panel-text">
             Visits
           </div>
-          <count-to :start-val="0" :end-val="visitCount" :duration="2600" class="card-panel-num" />
+          <count-to :start-val="0" :end-val="visitCount" :duration="getDuration(visitCount)" class="card-panel-num" />
         </div>
       </div>
     </el-col>
 
     <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
-      <div class="card-panel" @click="handleSetLineChartData('views')">
+      <div class="card-panel">
         <div class="card-panel-icon-wrapper icon-view">
           <svg-icon icon-class="eye-open" class-name="card-panel-icon" />
         </div>
@@ -37,13 +37,13 @@
           <div class="card-panel-text">
             Views
           </div>
-          <count-to :start-val="0" :end-val="viewCount" :duration="3200" class="card-panel-num" />
+          <count-to :start-val="0" :end-val="viewCount" :duration="getDuration(viewCount)" class="card-panel-num" />
         </div>
       </div>
     </el-col>
 
     <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
-      <div class="card-panel" @click="handleSetLineChartData('articlies')">
+      <div class="card-panel">
         <div class="card-panel-icon-wrapper icon-article">
           <svg-icon icon-class="education" class-name="card-panel-icon" />
         </div>
@@ -51,7 +51,7 @@
           <div class="card-panel-text">
             Articles
           </div>
-          <count-to :start-val="0" :end-val="articlyCount" :duration="3000" class="card-panel-num" />
+          <count-to :start-val="0" :end-val="articlyCount" :duration="getDuration(articlyCount)" class="card-panel-num" />
         </div>
       </div>
     </el-col>
@@ -102,8 +102,8 @@ export default {
         this.articlyCount = response.data || 0
       })
     },
-    handleSetLineChartData(type) {
-      this.$emit('handleSetLineChartData', type)
+    getDuration(value) {
+      return value ? value / 10 : 1
     }
   }
 }

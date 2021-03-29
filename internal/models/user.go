@@ -32,13 +32,22 @@ func UserGetByEmail(email string) (*User, error) {
 	return &user, nil
 }
 
-func UserGetById(id uint) (*User, error) {
+func UserGetById(id int) (*User, error) {
 	var user User
 	err := db.Where("id = ?", id).First(&user).Error
 	if err != nil {
 		return nil, err
 	}
 	return &user, nil
+}
+
+func UserUpdate(id int, data map[string]interface{}) (*User, error) {
+	user, _ := UserGetById(id)
+	err := db.Model(&user).Updates(data).Error
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
 }
 
 func UserEncodePassword(password string) string {

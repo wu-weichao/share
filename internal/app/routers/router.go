@@ -19,7 +19,9 @@ func InitRouter() *gin.Engine {
 	r := gin.New()
 
 	// middleware
+
 	r.Use(middleware.Cors())
+	r.Use(middleware.Log())
 
 	// templates
 	r.HTMLRender = loadTemplates("../../web/template/blog")
@@ -41,9 +43,11 @@ func InitRouter() *gin.Engine {
 
 		// with auth token
 		apiv1WithAuth := apiv1.Group("")
+		// middleware
 		apiv1WithAuth.Use(middleware.JWTAuth())
 		{
 			apiv1WithAuth.GET("/user_info", v1.LoginUserInfo)
+			apiv1WithAuth.PUT("/user_update", v1.UpdateUser)
 
 			apiv1WithAuth.GET("/tags", v1.GetTags)
 			apiv1WithAuth.GET("/simple_tags", v1.GetSimpleTags)
@@ -70,10 +74,13 @@ func InitRouter() *gin.Engine {
 			apiv1WithAuth.GET("/statistics/visit_count", v1.GetVisitCount)
 			apiv1WithAuth.GET("/statistics/view_count", v1.GetViewCount)
 			apiv1WithAuth.GET("/statistics/articly_count", v1.GetArticlyCount)
+			apiv1WithAuth.GET("/statistics/range", v1.GetStatisticsRange)
 		}
 	}
 	// frontend group
 	front := r.Group("/blog")
+	// middleware
+	front.Use(middleware.Statistics())
 	{
 		front.GET("/", web.Homepage)
 		front.GET("/page/:num", web.Homepage)

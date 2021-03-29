@@ -7,6 +7,7 @@ import (
 	"share/internal/app/routers"
 	_ "share/internal/database"
 	_ "share/internal/models"
+	_ "share/internal/schedule"
 )
 
 func main() {

@@ -27,3 +27,10 @@ export function getArticlyCount() {
     method: 'get'
   })
 }
+
+export function getStatisticsRange() {
+  return request({
+    url: '/statistics/range',
+    method: 'get'
+  })
+}

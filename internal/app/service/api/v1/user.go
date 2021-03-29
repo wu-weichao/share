@@ -23,6 +23,13 @@ type UserResponse struct {
 	Roles     []string `json:"roles"`
 }
 
+type UserStoreRequest struct {
+	Name     string `form:"name" binding:"required"`
+	Email    string `form:"email" binding:"required"`
+	Password string `form:"password"`
+	Avatar   string `form:"avatar"`
+}
+
 func Login(c *gin.Context) {
 	// validate params
 	var form LoginRequest
@@ -62,7 +69,7 @@ func Logout(c *gin.Context) {
 func LoginUserInfo(c *gin.Context) {
 	// get login user
 	jwtUser, _ := c.Get("user")
-	user, err := models.UserGetById(jwtUser.(*middleware.CustomClaims).ID)
+	user, err := models.UserGetById(int(jwtUser.(*middleware.CustomClaims).ID))
 	if err != nil {
 		api.ErrorRequest(c, "User not exists")
 		return
@@ -83,4 +90,37 @@ func LoginUserInfo(c *gin.Context) {
 		Roles:     roles,
 		Status:    user.Status,
 	})
+}
+
+func UpdateUser(c *gin.Context) {
+	var form UserStoreRequest
+	var err error
+	if err = c.ShouldBind(&form); err != nil {
+		api.ErrorRequest(c, err.Error())
+		return
+	}
+	jwtUser, _ := c.Get("user")
+	userId := int(jwtUser.(*middleware.CustomClaims).ID)
+	_, err = models.UserGetById(userId)
+	if err != nil {
+		api.ErrorRequest(c, "User not exists")
+		return
+	}
+	updateData := map[string]interface{}{
+		"name":  form.Name,
+		"email": form.Email,
+	}
+	if form.Password != "" {
+		updateData["password"] = models.UserEncodePassword(form.Password)
+	}
+	if form.Avatar != "" {
+		updateData["avatar"] = form.Avatar
+	}
+	_, err = models.UserUpdate(userId, updateData)
+	if err != nil {
+		api.ErrorRequest(c, "User update failed")
+		return
+	}
+
+	api.Success(c, "")
 }

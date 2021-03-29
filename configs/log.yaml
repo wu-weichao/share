@@ -1,0 +1,4 @@
+log:
+  path: ../../runtime/logs
+  # 0-6 PanicLevel FatalLevel ErrorLevel WarnLevel InfoLevel DebugLevel TraceLevel
+  level: 6

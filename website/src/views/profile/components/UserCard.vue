@@ -6,10 +6,11 @@
 
     <div class="user-profile">
       <div class="box-center">
-        <pan-thumb :image="user.avatar" :height="'100px'" :width="'100px'" :hoverable="false">
+        <pan-thumb v-if="user.avatar" :image="user.avatar" :height="'100px'" :width="'100px'" :hoverable="false">
           <div>Hello</div>
           {{ user.role }}
         </pan-thumb>
+        <img v-else src="@/assets/images/user.png" class="user-avatar">
       </div>
       <div class="box-center">
         <div class="user-name text-center">{{ user.name }}</div>
@@ -18,16 +19,16 @@
     </div>
 
     <div class="user-bio">
-      <div class="user-education user-bio-section">
+      <!-- <div class="user-education user-bio-section">
         <div class="user-bio-section-header"><svg-icon icon-class="education" /><span>Education</span></div>
         <div class="user-bio-section-body">
           <div class="text-muted">
             JS in Computer Science from the University of Technology
           </div>
         </div>
-      </div>
+      </div> -->
 
-      <div class="user-skills user-bio-section">
+      <!-- <div class="user-skills user-bio-section">
         <div class="user-bio-section-header"><svg-icon icon-class="skill" /><span>Skills</span></div>
         <div class="user-bio-section-body">
           <div class="progress-item">
@@ -47,7 +48,7 @@
             <el-progress :percentage="100" status="success" />
           </div>
         </div>
-      </div>
+      </div> -->
     </div>
   </el-card>
 </template>

@@ -51,6 +51,13 @@ type HtmlConfig struct {
 
 var Html = &HtmlConfig{}
 
+type LogConfig struct {
+	Path  string `mapstructure:"path"`
+	Level int    `mapstructure:"level"`
+}
+
+var Log = &LogConfig{}
+
 var once sync.Once
 
 func init() {
@@ -75,5 +82,12 @@ func init() {
 		}
 		viper.UnmarshalKey("database", Database)
 		viper.UnmarshalKey("redis", Redis)
+		// load log.yaml
+		viper.SetConfigName("log")
+		err = viper.ReadInConfig()
+		if err != nil {
+			panic(fmt.Sprintf("load log.yaml err: %v\n", err))
+		}
+		viper.UnmarshalKey("log", Log)
 	})
 }
