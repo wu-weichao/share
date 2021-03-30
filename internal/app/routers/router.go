@@ -26,6 +26,7 @@ func InitRouter() *gin.Engine {
 
 	// static
 	r.StaticFS("/static", http.Dir("../../web/static"))
+	r.StaticFS("/admin", http.Dir("../../web/app"))
 
 	// router
 	r.GET("/", func(c *gin.Context) {
