@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func Init() {
+func init() {
 	visitStatistics()
 }
 
