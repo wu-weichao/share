@@ -1,5 +1,6 @@
 {{ define "content" }}
-<link rel="stylesheet" href="/static/css/github-markdown.min.css">
+{{/*<link rel="stylesheet" href="/static/css/github-markdown.min.css">*/}}
+<link rel="stylesheet" href="/static/css/toastui-editor-viewer.css">
 <div class="layout-container-content">
     <div class="article-detail">
         <div class="title">{{ .article.Title }}</div>
@@ -8,7 +9,8 @@
             <div><img src="/static/images/eye.svg">{{ .article.View }}</div>
             <div><img src="/static/images/tag.svg">{{ implode .article.Tags "、" }}</div>
         </div>
-        <div class="markdown-body">
+{{/*        <div class="markdown-body">*/}}
+        <div class="tui-editor-contents">
             {{ .article.Html | html}}
         </div>
     </div>
