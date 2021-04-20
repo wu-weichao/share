@@ -59,9 +59,9 @@ func ShowArticle(c *gin.Context) {
 	}
 
 	View(c, "article", gin.H{
-		"headTitle":       detail.Title,
-		"headKeywords":    detail.Keywords,
-		"headDescription": detail.Description,
-		"article":         detail,
+		"headerTitle":       detail.Title,
+		"headerKeywords":    detail.Keywords,
+		"headerDescription": detail.Description,
+		"article":           detail,
 	})
 }

@@ -1,7 +1,11 @@
 {{ define "footer" }}
 
 <div class="layout-footer">
-    <p>Copyright©2021 wwc</p>
+    <p>{{ .footerCopyright }}
+        {{ if .footerIcp }}
+            <a href="http://beian.miit.gov.cn/" target="_blank"> | 浙ICP备2021011629号</a>
+        {{ end}}
+    </p>
 </div>
 
 {{ end }}

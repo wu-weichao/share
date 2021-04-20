@@ -11,3 +11,5 @@ html:
   title: Share
   keywords: Share,Golang,Blog
   description: a minimalist style blog base on golang
+  copyright: Copyright©2021 WWC
+  icp: 浙ICP备2021011629号

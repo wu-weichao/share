@@ -48,6 +48,8 @@ type HtmlConfig struct {
 	Title       string `mapstructure:"title"`
 	Keywords    string `mapstructure:"keywords"`
 	Description string `mapstructure:"description"`
+	Copyright   string `mapstructure:"copyright"`
+	Icp         string `mapstructure:"icp"`
 }
 
 var Html = &HtmlConfig{}

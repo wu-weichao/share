@@ -30,9 +30,11 @@ func View500(c *gin.Context) {
 func formatViewData(h gin.H) gin.H {
 	// common info
 	data := gin.H{
-		"headTitle":       configs.Html.Title,
-		"headKeywords":    configs.Html.Keywords,
-		"headDescription": configs.Html.Description,
+		"headerTitle":       configs.Html.Title,
+		"headerKeywords":    configs.Html.Keywords,
+		"headerDescription": configs.Html.Description,
+		"footerCopyright":   configs.Html.Copyright,
+		"footerIcp":         configs.Html.Icp,
 	}
 	data["topics"], _ = getViewTopic()
 
